@@ -1,0 +1,112 @@
+{
+  "usageEvents": [
+    {
+      "id": "d5dfc1d2-6c51-4154-96a8-3d232eecb511",
+      "capability": "assistants",
+      "templateId": "ai-workflow-assistant",
+      "templateVersion": 1,
+      "reviewerMode": "review_required",
+      "model": "atlas-deterministic-gateway-v1",
+      "durationMs": 5,
+      "evidenceCount": 5,
+      "createdAt": "2026-03-12T13:13:21.987Z"
+    },
+    {
+      "id": "3323784f-9f64-4df3-8bdd-6a10dfcd7c3b",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "templateVersion": 1,
+      "reviewerMode": "review_required",
+      "model": "atlas-deterministic-gateway-v1",
+      "durationMs": 1,
+      "evidenceCount": 1,
+      "createdAt": "2026-03-12T13:13:21.981Z"
+    },
+    {
+      "id": "294c90e0-1833-4af0-958b-101d4f4284fe",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "templateVersion": 1,
+      "reviewerMode": "review_required",
+      "model": "atlas-deterministic-gateway-v1",
+      "durationMs": 1,
+      "evidenceCount": 3,
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "494ceae6-c095-43cd-8a22-15d03e489cae",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "templateVersion": 1,
+      "reviewerMode": "review_required",
+      "model": "atlas-deterministic-gateway-v1",
+      "durationMs": 1,
+      "evidenceCount": 2,
+      "createdAt": "2026-03-12T13:13:21.971Z"
+    },
+    {
+      "id": "74eaf379-abf7-4992-8a84-5bcb7aa1abd8",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "templateVersion": 1,
+      "reviewerMode": "evidence_only",
+      "model": "atlas-deterministic-gateway-v1",
+      "durationMs": 2,
+      "evidenceCount": 5,
+      "createdAt": "2026-03-12T13:13:21.967Z"
+    }
+  ],
+  "guardrailEvents": [
+    {
+      "id": "c366fcef-96af-42c7-94de-49e1125225f1",
+      "capability": "assistants",
+      "templateId": "ai-workflow-assistant",
+      "reviewerMode": "review_required",
+      "violations": [],
+      "redactions": [],
+      "approved": true,
+      "createdAt": "2026-03-12T13:13:21.987Z"
+    },
+    {
+      "id": "500cd9f9-a906-4cda-afbe-e49367197ee3",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "reviewerMode": "review_required",
+      "violations": [],
+      "redactions": [],
+      "approved": true,
+      "createdAt": "2026-03-12T13:13:21.981Z"
+    },
+    {
+      "id": "afd8d86c-2ed6-4275-8cd0-740b03bfdc03",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "reviewerMode": "review_required",
+      "violations": [],
+      "redactions": [],
+      "approved": true,
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "198dc0ea-15ed-4b77-b542-84abcdb4ee81",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "reviewerMode": "review_required",
+      "violations": [],
+      "redactions": [],
+      "approved": true,
+      "createdAt": "2026-03-12T13:13:21.971Z"
+    },
+    {
+      "id": "7eee390b-61fd-4c97-83fa-3119706a6fa5",
+      "capability": "search",
+      "templateId": "ai-search-evidence-answer",
+      "reviewerMode": "evidence_only",
+      "violations": [],
+      "redactions": [],
+      "approved": true,
+      "createdAt": "2026-03-12T13:13:21.967Z"
+    }
+  ],
+  "evaluationRuns": []
+}

@@ -1,0 +1,738 @@
+{
+  "assets": [
+    {
+      "id": "asset-haul-01",
+      "name": "Komatsu 930E Haul Truck 01",
+      "site": "Mbalam North",
+      "category": "fleet",
+      "className": "Ultra-class haul truck",
+      "owner": "Mining Operations",
+      "status": "operational",
+      "utilizationTarget": 82,
+      "fuelTargetPerUnit": 0.58,
+      "energyTargetPerUnit": 0,
+      "throughputTarget": 720,
+      "inspectionDueAt": "2026-03-18T08:00:00.000Z",
+      "serviceIntervalHours": 720,
+      "runtimeHours": 684,
+      "commercialRatePerUnit": 12,
+      "createdAt": "2026-03-12T08:00:00.000Z",
+      "updatedAt": "2026-03-12T08:00:00.000Z"
+    },
+    {
+      "id": "asset-crush-01",
+      "name": "Primary Crusher Line A",
+      "site": "Lobe Plant",
+      "category": "plant",
+      "className": "Jaw crusher",
+      "owner": "Processing Plant",
+      "status": "operational",
+      "utilizationTarget": 88,
+      "fuelTargetPerUnit": 0,
+      "energyTargetPerUnit": 5.4,
+      "throughputTarget": 610,
+      "inspectionDueAt": "2026-03-14T08:00:00.000Z",
+      "serviceIntervalHours": 480,
+      "runtimeHours": 466,
+      "commercialRatePerUnit": 9.5,
+      "createdAt": "2026-03-12T08:00:00.000Z",
+      "updatedAt": "2026-03-12T08:00:00.000Z"
+    },
+    {
+      "id": "asset-gen-01",
+      "name": "Hybrid Power Plant Block 1",
+      "site": "Kribi Logistics Corridor",
+      "category": "energy",
+      "className": "Hybrid generation block",
+      "owner": "Energy Services",
+      "status": "operational",
+      "utilizationTarget": 90,
+      "fuelTargetPerUnit": 0.12,
+      "energyTargetPerUnit": 1,
+      "throughputTarget": 140,
+      "inspectionDueAt": "2026-03-16T08:00:00.000Z",
+      "serviceIntervalHours": 650,
+      "runtimeHours": 621,
+      "commercialRatePerUnit": 18,
+      "createdAt": "2026-03-12T08:00:00.000Z",
+      "updatedAt": "2026-03-12T08:00:00.000Z"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "conn-haul-can",
+      "assetId": "asset-haul-01",
+      "type": "can_bus",
+      "label": "Truck CAN bus",
+      "status": "online",
+      "pollingIntervalMinutes": 5,
+      "lastSyncAt": "2026-03-12T08:00:00.000Z",
+      "mappedMetrics": [
+        "utilization",
+        "fuel_burn",
+        "throughput",
+        "vibration",
+        "downtime_minutes"
+      ]
+    },
+    {
+      "id": "conn-crush-scada",
+      "assetId": "asset-crush-01",
+      "type": "scada",
+      "label": "Crusher SCADA",
+      "status": "online",
+      "pollingIntervalMinutes": 5,
+      "lastSyncAt": "2026-03-12T13:13:21.975Z",
+      "mappedMetrics": [
+        "utilization",
+        "energy_draw",
+        "throughput",
+        "temperature",
+        "vibration",
+        "inspection_score"
+      ]
+    },
+    {
+      "id": "conn-gen-erp",
+      "assetId": "asset-gen-01",
+      "type": "erp",
+      "label": "Power plant data broker",
+      "status": "degraded",
+      "pollingIntervalMinutes": 15,
+      "lastSyncAt": "2026-03-12T08:00:00.000Z",
+      "mappedMetrics": [
+        "utilization",
+        "fuel_burn",
+        "energy_draw",
+        "revenue",
+        "inspection_score"
+      ]
+    }
+  ],
+  "telemetry": [
+    {
+      "id": "d8ede7b0-efb3-425e-a5a5-71026feaf6ca",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "temperature",
+      "timestamp": "2026-03-12T13:13:21.975Z",
+      "value": 101,
+      "unit": "c",
+      "quality": 0.95,
+      "tags": [
+        "connector:scada",
+        "live"
+      ]
+    },
+    {
+      "id": "cc581f48-fd63-4dc2-be57-7556ba38a7c1",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "vibration",
+      "timestamp": "2026-03-12T13:13:21.975Z",
+      "value": 9.5,
+      "unit": "mm/s",
+      "quality": 0.95,
+      "tags": [
+        "connector:scada",
+        "live"
+      ]
+    },
+    {
+      "id": "t2",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "utilization",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 69,
+      "unit": "%",
+      "quality": 0.99,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t4",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "fuel_burn",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 0.71,
+      "unit": "l/tonne",
+      "quality": 0.97,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t5",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "throughput",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 640,
+      "unit": "tph",
+      "quality": 0.98,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t7",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "vibration",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 7.2,
+      "unit": "mm/s",
+      "quality": 0.96,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t8",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "downtime_minutes",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 44,
+      "unit": "minutes",
+      "quality": 0.95,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t9",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "revenue",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 7680,
+      "unit": "usd/hour",
+      "quality": 0.96,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "id": "t11",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "utilization",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 92,
+      "unit": "%",
+      "quality": 0.98,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t13",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "energy_draw",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 6.3,
+      "unit": "kwh/tonne",
+      "quality": 0.97,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t14",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "throughput",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 625,
+      "unit": "tph",
+      "quality": 0.99,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t15",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "temperature",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 96,
+      "unit": "c",
+      "quality": 0.95,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t16",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "vibration",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 8.9,
+      "unit": "mm/s",
+      "quality": 0.94,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t18",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "revenue",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 5937.5,
+      "unit": "usd/hour",
+      "quality": 0.96,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "id": "t20",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "utilization",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 81,
+      "unit": "%",
+      "quality": 0.87,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t22",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "fuel_burn",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 0.16,
+      "unit": "l/kwh",
+      "quality": 0.86,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t23",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "energy_draw",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 1.18,
+      "unit": "kwh/kwh",
+      "quality": 0.85,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t25",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "revenue",
+      "timestamp": "2026-03-12T07:00:00.000Z",
+      "value": 2520,
+      "unit": "usd/hour",
+      "quality": 0.88,
+      "tags": [
+        "live"
+      ]
+    },
+    {
+      "id": "t17",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "inspection_score",
+      "timestamp": "2026-03-12T06:00:00.000Z",
+      "value": 82,
+      "unit": "score",
+      "quality": 0.93,
+      "tags": [
+        "inspection"
+      ]
+    },
+    {
+      "id": "t24",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "inspection_score",
+      "timestamp": "2026-03-12T05:00:00.000Z",
+      "value": 74,
+      "unit": "score",
+      "quality": 0.9,
+      "tags": [
+        "inspection"
+      ]
+    },
+    {
+      "id": "t1",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "utilization",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 78,
+      "unit": "%",
+      "quality": 0.98,
+      "tags": [
+        "baseline"
+      ]
+    },
+    {
+      "id": "t3",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "fuel_burn",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 0.55,
+      "unit": "l/tonne",
+      "quality": 0.97,
+      "tags": [
+        "baseline"
+      ]
+    },
+    {
+      "id": "t6",
+      "assetId": "asset-haul-01",
+      "connectorId": "conn-haul-can",
+      "metric": "vibration",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 4.9,
+      "unit": "mm/s",
+      "quality": 0.96,
+      "tags": [
+        "baseline"
+      ]
+    },
+    {
+      "id": "t10",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "utilization",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 90,
+      "unit": "%",
+      "quality": 0.98,
+      "tags": [
+        "baseline"
+      ]
+    },
+    {
+      "id": "t12",
+      "assetId": "asset-crush-01",
+      "connectorId": "conn-crush-scada",
+      "metric": "energy_draw",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 5.1,
+      "unit": "kwh/tonne",
+      "quality": 0.97,
+      "tags": [
+        "baseline"
+      ]
+    },
+    {
+      "id": "t19",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "utilization",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 93,
+      "unit": "%",
+      "quality": 0.9,
+      "tags": [
+        "baseline"
+      ]
+    },
+    {
+      "id": "t21",
+      "assetId": "asset-gen-01",
+      "connectorId": "conn-gen-erp",
+      "metric": "fuel_burn",
+      "timestamp": "2026-03-12T02:00:00.000Z",
+      "value": 0.11,
+      "unit": "l/kwh",
+      "quality": 0.88,
+      "tags": [
+        "baseline"
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "id": "asset-haul-01-fuel_burn",
+      "assetId": "asset-haul-01",
+      "metric": "fuel_burn",
+      "severity": "critical",
+      "title": "Komatsu 930E Haul Truck 01 fuel burn deviation",
+      "detail": "Current 0.71l/tonne vs baseline 0.55l/tonne (29.1%).",
+      "detectedAt": "2026-03-12T07:00:00.000Z",
+      "score": 0.73,
+      "currentValue": 0.71,
+      "baseline": 0.55
+    },
+    {
+      "id": "asset-haul-01-vibration",
+      "assetId": "asset-haul-01",
+      "metric": "vibration",
+      "severity": "critical",
+      "title": "Komatsu 930E Haul Truck 01 vibration deviation",
+      "detail": "Current 7.2mm/s vs baseline 4.9mm/s (46.9%).",
+      "detectedAt": "2026-03-12T07:00:00.000Z",
+      "score": 1,
+      "currentValue": 7.2,
+      "baseline": 4.9
+    },
+    {
+      "id": "asset-crush-01-energy_draw",
+      "assetId": "asset-crush-01",
+      "metric": "energy_draw",
+      "severity": "warning",
+      "title": "Primary Crusher Line A energy draw deviation",
+      "detail": "Current 6.3kwh/tonne vs baseline 5.1kwh/tonne (23.5%).",
+      "detectedAt": "2026-03-12T07:00:00.000Z",
+      "score": 0.59,
+      "currentValue": 6.3,
+      "baseline": 5.1
+    },
+    {
+      "id": "asset-gen-01-utilization",
+      "assetId": "asset-gen-01",
+      "metric": "utilization",
+      "severity": "warning",
+      "title": "Hybrid Power Plant Block 1 utilization deviation",
+      "detail": "Current 81% vs baseline 93% (-12.9%).",
+      "detectedAt": "2026-03-12T07:00:00.000Z",
+      "score": 0.32,
+      "currentValue": 81,
+      "baseline": 93
+    },
+    {
+      "id": "asset-gen-01-fuel_burn",
+      "assetId": "asset-gen-01",
+      "metric": "fuel_burn",
+      "severity": "critical",
+      "title": "Hybrid Power Plant Block 1 fuel burn deviation",
+      "detail": "Current 0.16l/kwh vs baseline 0.11l/kwh (45.5%).",
+      "detectedAt": "2026-03-12T07:00:00.000Z",
+      "score": 1,
+      "currentValue": 0.16,
+      "baseline": 0.11
+    }
+  ],
+  "maintenance": [
+    {
+      "id": "asset-haul-01-maint-90",
+      "assetId": "asset-haul-01",
+      "title": "Komatsu 930E Haul Truck 01 predictive maintenance window",
+      "reason": "2 anomaly signals indicate rising failure likelihood.",
+      "dueAt": "2026-03-13T13:13:21.977Z",
+      "predictedFailureWindowDays": 2,
+      "estimatedDowntimeHours": 10.2,
+      "recommendedAction": "Inspect bearings, lubrication loop, and drivetrain alignment.",
+      "status": "scheduled",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "asset-crush-01-maint-76",
+      "assetId": "asset-crush-01",
+      "title": "Primary Crusher Line A predictive maintenance window",
+      "reason": "Service interval due in 14 runtime hours.",
+      "dueAt": "2026-03-13T13:13:21.977Z",
+      "predictedFailureWindowDays": 3,
+      "estimatedDowntimeHours": 9.1,
+      "recommendedAction": "Execute OEM preventive maintenance pack and reset condition baseline.",
+      "status": "recommended",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "asset-gen-01-maint-79",
+      "assetId": "asset-gen-01",
+      "title": "Hybrid Power Plant Block 1 predictive maintenance window",
+      "reason": "Service interval due in 29 runtime hours.",
+      "dueAt": "2026-03-13T13:13:21.977Z",
+      "predictedFailureWindowDays": 3,
+      "estimatedDowntimeHours": 9.3,
+      "recommendedAction": "Execute OEM preventive maintenance pack and reset condition baseline.",
+      "status": "recommended",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert-asset-haul-01-fuel_burn",
+      "assetId": "asset-haul-01",
+      "severity": "critical",
+      "channel": "ops",
+      "title": "Komatsu 930E Haul Truck 01 fuel burn deviation",
+      "body": "Current 0.71l/tonne vs baseline 0.55l/tonne (29.1%).",
+      "createdAt": "2026-03-12T07:00:00.000Z"
+    },
+    {
+      "id": "alert-asset-haul-01-vibration",
+      "assetId": "asset-haul-01",
+      "severity": "critical",
+      "channel": "ops",
+      "title": "Komatsu 930E Haul Truck 01 vibration deviation",
+      "body": "Current 7.2mm/s vs baseline 4.9mm/s (46.9%).",
+      "createdAt": "2026-03-12T07:00:00.000Z"
+    },
+    {
+      "id": "alert-asset-crush-01-energy_draw",
+      "assetId": "asset-crush-01",
+      "severity": "warning",
+      "channel": "ops",
+      "title": "Primary Crusher Line A energy draw deviation",
+      "body": "Current 6.3kwh/tonne vs baseline 5.1kwh/tonne (23.5%).",
+      "createdAt": "2026-03-12T07:00:00.000Z"
+    },
+    {
+      "id": "alert-asset-gen-01-utilization",
+      "assetId": "asset-gen-01",
+      "severity": "warning",
+      "channel": "ops",
+      "title": "Hybrid Power Plant Block 1 utilization deviation",
+      "body": "Current 81% vs baseline 93% (-12.9%).",
+      "createdAt": "2026-03-12T07:00:00.000Z"
+    },
+    {
+      "id": "alert-asset-gen-01-fuel_burn",
+      "assetId": "asset-gen-01",
+      "severity": "critical",
+      "channel": "ops",
+      "title": "Hybrid Power Plant Block 1 fuel burn deviation",
+      "body": "Current 0.16l/kwh vs baseline 0.11l/kwh (45.5%).",
+      "createdAt": "2026-03-12T07:00:00.000Z"
+    },
+    {
+      "id": "alert-asset-haul-01-maint-90",
+      "assetId": "asset-haul-01",
+      "severity": "warning",
+      "channel": "maintenance",
+      "title": "Komatsu 930E Haul Truck 01 predictive maintenance window",
+      "body": "2 anomaly signals indicate rising failure likelihood. Inspect bearings, lubrication loop, and drivetrain alignment.",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "alert-asset-crush-01-maint-76",
+      "assetId": "asset-crush-01",
+      "severity": "warning",
+      "channel": "maintenance",
+      "title": "Primary Crusher Line A predictive maintenance window",
+      "body": "Service interval due in 14 runtime hours. Execute OEM preventive maintenance pack and reset condition baseline.",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "alert-asset-gen-01-maint-79",
+      "assetId": "asset-gen-01",
+      "severity": "warning",
+      "channel": "maintenance",
+      "title": "Hybrid Power Plant Block 1 predictive maintenance window",
+      "body": "Service interval due in 29 runtime hours. Execute OEM preventive maintenance pack and reset condition baseline.",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "alert-compliance-asset-crush-01",
+      "assetId": "asset-crush-01",
+      "severity": "warning",
+      "channel": "compliance",
+      "title": "Inspection readiness watch",
+      "body": "1 finding(s), 1 missing document(s), readiness 58%.",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "alert-compliance-asset-gen-01",
+      "assetId": "asset-gen-01",
+      "severity": "critical",
+      "channel": "compliance",
+      "title": "Inspection readiness non compliant",
+      "body": "2 finding(s), 2 missing document(s), readiness 16%.",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    },
+    {
+      "id": "alert-commercial-asset-haul-01",
+      "assetId": "asset-haul-01",
+      "severity": "warning",
+      "channel": "commercial",
+      "title": "Komatsu 930E Haul Truck 01 commercial underperformance",
+      "body": "Utilization 69% vs target 82%; revenue/hour 7680 vs expected 7680.",
+      "createdAt": "2026-03-12T13:13:21.977Z"
+    }
+  ],
+  "compliance": [
+    {
+      "assetId": "asset-haul-01",
+      "status": "ready",
+      "inspectionDueAt": "2026-03-18T08:00:00.000Z",
+      "lastInspectionScore": 91,
+      "requiredDocuments": [
+        {
+          "name": "Operator checklist",
+          "present": true
+        },
+        {
+          "name": "Brake certification",
+          "present": true
+        },
+        {
+          "name": "Insurance rider",
+          "present": true
+        }
+      ],
+      "openFindings": []
+    },
+    {
+      "assetId": "asset-crush-01",
+      "status": "watch",
+      "inspectionDueAt": "2026-03-14T08:00:00.000Z",
+      "lastInspectionScore": 82,
+      "requiredDocuments": [
+        {
+          "name": "Lifting inspection",
+          "present": true
+        },
+        {
+          "name": "Wear liner report",
+          "present": false
+        },
+        {
+          "name": "Guarding validation",
+          "present": true
+        }
+      ],
+      "openFindings": [
+        "Wear liner replacement evidence missing"
+      ]
+    },
+    {
+      "assetId": "asset-gen-01",
+      "status": "non_compliant",
+      "inspectionDueAt": "2026-03-16T08:00:00.000Z",
+      "lastInspectionScore": 74,
+      "requiredDocuments": [
+        {
+          "name": "Emissions log",
+          "present": false
+        },
+        {
+          "name": "Grid synchronization certificate",
+          "present": true
+        },
+        {
+          "name": "Fuel handling SOP signoff",
+          "present": false
+        }
+      ],
+      "openFindings": [
+        "Emissions evidence overdue",
+        "Fuel handling SOP signoff expired"
+      ]
+    }
+  ]
+}
