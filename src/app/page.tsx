@@ -2,6 +2,13 @@ import Link from "next/link";
 
 const modules = [
   {
+    title: "Module 0 · Platform Foundations & Secure Multi-Tenancy",
+    href: "/admin",
+    description:
+      "Organization/workspace/portfolio hierarchy, JWT auth with MFA, RBAC + ABAC, session management, SSO config, central audit log, notifications, and tasks.",
+    status: "New",
+  },
+  {
     title: "Module 1 · Deal Radar & Origination Command Center",
     href: "/deal-radar",
     description:
