@@ -33,6 +33,7 @@ Organization (multi-tenant)
 | **7 - Execution Digital Twin** | `/execution` | Milestone control, project controls, contractor scorecards, field workflows, procurement tracker, integrated variance reporting |
 | **8 - Asset Intelligence** | `/assets` | Telemetry ingestion, anomaly detection, predictive maintenance, compliance monitoring, efficiency, commercial analytics |
 | **10 - Client / Investor / Operator Portals** | `/portals` | Executive cockpit, investor reporting portal, operator oversight, white-label delivery, exports, notifications |
+| **12 - DevSecOps & Enterprise Ops** | `/support-console` | Release controls, deployment automation, runbooks, incident command, observability, and QA guardrails |
 | Evidence Workspace | `/evidence` | Evidence-card registry for diligence artefacts |
 
 ## Module 0: Platform Foundations & Secure Multi-Tenancy
@@ -182,6 +183,18 @@ The schema is designed for easy migration:
 | GET/PATCH | `/api/esg/{id}` | Retrieve/update community case, obligation, or action |
 | GET/POST | `/api/incidents` | Incident dashboard, create incidents or incident actions |
 | GET/PATCH | `/api/incidents/{id}` | Retrieve/update incident or linked action |
+
+## Module 12: DevSecOps, Observability, QA and Enterprise Operations
+
+- `/api/deploy` for environment-aware deployment plans, status transitions, and rollback markers
+- `/api/releases` for release approvals, scheduling, release manifests, and rollback version control
+- `/api/incidents?domain=enterprise` for support / platform incidents, incident command, customer updates, and runbook linkage
+- `/api/runbooks` for the enterprise runbook repository backing `docs/runbooks/`
+- `.github/workflows/ci.yml` and `.github/workflows/release.yml` for CI/CD, CodeQL security scanning, quality gates, and controlled promotions
+- `infra/terraform/main.tf` for infrastructure-as-code release controls and environment metadata
+- `observability/dashboards/*.json` for dashboard integration points and tracing / alert contract definitions
+- `scripts/security/rotate-secrets-check.mjs` for secrets-rotation gate hooks in the release pipeline
+- `tests/module12-devsecops.test.ts` for regression, performance, resilience, and security governance coverage
 
 ## Module 8: Asset Intelligence, Telemetry and Predictive Maintenance
 

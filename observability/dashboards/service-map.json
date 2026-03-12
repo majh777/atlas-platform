@@ -1,0 +1,8 @@
+{
+  "title": "Atlas Service Map",
+  "services": [
+    {"name": "api", "dependsOn": ["sqlite", "notifications", "audit-log"]},
+    {"name": "support-console", "dependsOn": ["api", "runbooks", "incident-command"]},
+    {"name": "release-orchestrator", "dependsOn": ["api", "observability", "security-scans"]}
+  ]
+}

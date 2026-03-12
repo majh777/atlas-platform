@@ -574,3 +574,135 @@ CREATE INDEX IF NOT EXISTS idx_report_packs_org_type
 
 CREATE INDEX IF NOT EXISTS idx_stakeholder_metrics_scope
   ON stakeholder_metrics(org_id, metric_type, period_end);
+
+-- ============================================================
+-- Module 12: DevSecOps, Observability, QA and Enterprise Ops
+-- ============================================================
+CREATE TABLE IF NOT EXISTS ops_runbooks (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  owner_team TEXT,
+  severity_scope TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('draft', 'active', 'archived')),
+  repository_path TEXT,
+  tags TEXT NOT NULL DEFAULT '[]', -- JSON array
+  steps TEXT NOT NULL DEFAULT '[]', -- JSON array
+  verification TEXT NOT NULL DEFAULT '[]', -- JSON array
+  created_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  updated_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ops_releases (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  version TEXT NOT NULL,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'approved', 'scheduled', 'released', 'rolled_back', 'cancelled')),
+  environment TEXT NOT NULL CHECK (environment IN ('dev', 'staging', 'production', 'dr')),
+  risk_level TEXT NOT NULL DEFAULT 'medium' CHECK (risk_level IN ('low', 'medium', 'high', 'critical')),
+  release_notes TEXT,
+  change_summary TEXT,
+  runbook_id TEXT REFERENCES ops_runbooks(id) ON DELETE SET NULL,
+  rollback_version TEXT,
+  scheduled_for TEXT,
+  approved_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  deployed_at TEXT,
+  created_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  metadata TEXT NOT NULL DEFAULT '{}', -- JSON object
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ops_deployments (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  release_id TEXT REFERENCES ops_releases(id) ON DELETE SET NULL,
+  environment TEXT NOT NULL CHECK (environment IN ('dev', 'staging', 'production', 'dr')),
+  status TEXT NOT NULL DEFAULT 'planned' CHECK (status IN ('planned', 'running', 'succeeded', 'failed', 'rolled_back')),
+  version TEXT NOT NULL,
+  strategy TEXT NOT NULL DEFAULT 'blue-green',
+  rollback_version TEXT,
+  change_window TEXT,
+  approval_ticket TEXT,
+  observability_dashboard TEXT,
+  trace_id TEXT,
+  initiated_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  notes TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ops_incidents (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  deployment_id TEXT REFERENCES ops_deployments(id) ON DELETE SET NULL,
+  release_id TEXT REFERENCES ops_releases(id) ON DELETE SET NULL,
+  title TEXT NOT NULL,
+  severity TEXT NOT NULL CHECK (severity IN ('sev1', 'sev2', 'sev3', 'sev4')),
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'triaged', 'mitigating', 'monitoring', 'resolved', 'closed')),
+  source TEXT NOT NULL CHECK (source IN ('monitoring', 'security', 'support', 'deployment', 'manual')),
+  service TEXT,
+  summary TEXT NOT NULL,
+  impact TEXT,
+  runbook_id TEXT REFERENCES ops_runbooks(id) ON DELETE SET NULL,
+  owner_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  commander_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  detected_at TEXT NOT NULL,
+  resolved_at TEXT,
+  timeline TEXT NOT NULL DEFAULT '[]', -- JSON array
+  customer_updates TEXT NOT NULL DEFAULT '[]', -- JSON array
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ops_test_suites (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  suite_type TEXT NOT NULL CHECK (suite_type IN ('regression', 'performance', 'resilience', 'security')),
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'running', 'passed', 'failed')),
+  target_environment TEXT NOT NULL CHECK (target_environment IN ('dev', 'staging', 'production', 'dr')),
+  score REAL,
+  findings TEXT NOT NULL DEFAULT '[]', -- JSON array
+  executed_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ops_secret_rotations (
+  id TEXT PRIMARY KEY,
+  org_id TEXT NOT NULL,
+  secret_name TEXT NOT NULL,
+  environment TEXT NOT NULL CHECK (environment IN ('dev', 'staging', 'production', 'dr')),
+  owner_team TEXT,
+  rotation_interval_days INTEGER NOT NULL DEFAULT 30,
+  last_rotated_at TEXT,
+  next_due_at TEXT,
+  status TEXT NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'due', 'rotated', 'overdue')),
+  notes TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ops_runbooks_org_category
+  ON ops_runbooks(org_id, category, status);
+
+CREATE INDEX IF NOT EXISTS idx_ops_releases_org_env
+  ON ops_releases(org_id, environment, status, scheduled_for);
+
+CREATE INDEX IF NOT EXISTS idx_ops_deployments_org_env
+  ON ops_deployments(org_id, environment, status, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_ops_incidents_org_status
+  ON ops_incidents(org_id, status, severity, detected_at);
+
+CREATE INDEX IF NOT EXISTS idx_ops_test_suites_org_type
+  ON ops_test_suites(org_id, suite_type, status, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_ops_secret_rotations_org_due
+  ON ops_secret_rotations(org_id, environment, status, next_due_at);

@@ -158,9 +158,9 @@ async function buildCorpus(orgId?: string) {
   );
 
   corpus.push(
-    ...dataRoomDocs.map((row) => ({
+    ...dataRoomDocs.map((row): CorpusEntry => ({
       id: row.id,
-      sourceType: 'data_room_document' as const,
+      sourceType: 'data_room_document',
       title: row.title,
       text: `${row.title} ${row.category} ${row.collection_name} ${(row.evidence_links ?? '').toString()}`,
       citations: [
@@ -182,9 +182,9 @@ async function buildCorpus(orgId?: string) {
 
   if (orgId) {
     corpus.push(
-      ...listDiligenceQuestions({ orgId }).map((question) => ({
+      ...listDiligenceQuestions({ orgId }).map((question): CorpusEntry => ({
         id: question.id,
-        sourceType: 'diligence_question' as const,
+        sourceType: 'diligence_question',
         title: question.question,
         text: `${question.question} ${question.answer_text ?? ''}`,
         citations: [
@@ -374,7 +374,7 @@ export async function runDiligenceCopilot(input: { query: string; orgId?: string
 
   const issues: DiligenceIssue[] = dataset.documents
     .flatMap((document) =>
-      document.redFlags.map((flag) => ({
+      document.redFlags.map((flag): DiligenceIssue => ({
         id: flag.id,
         severity: flag.severity,
         title: flag.title,
@@ -398,7 +398,7 @@ export async function runDiligenceCopilot(input: { query: string; orgId?: string
     .flatMap((document) =>
       document.completenessChecks
         .filter((check) => check.status !== 'complete')
-        .map((check) => ({
+        .map((check): DiligencePrompt => ({
           id: `${document.id}:${check.id}`,
           question: `Please provide or confirm ${check.label.toLowerCase()} for ${document.name}.`,
           reason: check.detail,

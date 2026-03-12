@@ -24,7 +24,10 @@ export function getEvaluationCases() {
 }
 
 export function evaluateSearchLikeOutput(capability: 'search' | 'diligence', response: SearchResponse | { summary: string }): EvaluationResult[] {
-  const text = capability === 'search' ? response.answer : response.summary;
+  const responseSummary = 'summary' in response ? response.summary : '';
+  const text = capability === 'search'
+    ? ('answer' in response ? response.answer : responseSummary)
+    : responseSummary;
   const signals = extractSignals(text);
 
   return evaluationCases

@@ -1,0 +1,8 @@
+{
+  "title": "Atlas Release Health",
+  "panels": [
+    {"id": "deploy-success-rate", "query": "sum(rate(atlas_deploy_success_total[15m])) / sum(rate(atlas_deploy_total[15m]))"},
+    {"id": "api-p95", "query": "histogram_quantile(0.95, sum(rate(http_server_duration_bucket[5m])) by (le))"},
+    {"id": "incident-open", "query": "sum(atlas_ops_incident_open_total)"}
+  ]
+}
