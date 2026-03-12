@@ -2,68 +2,157 @@
 
 Atlas is a Next.js + TypeScript underwriting workspace for project-finance origination, diligence, bankability scoring, and lender-facing decision support.
 
-## Live modules
+## Architecture
 
-- `/deal-radar` — origination command center, score-based triage, watchlists, relationship notes, and committee-pack generation
-- `/documents` — dossier ingestion, classification, entity extraction, review workflows
-- `/evidence` — evidence-card registry for diligence artefacts
-- `/bankability` — **Module 4** bankability scoring and risk engineering
-- `/financial-modeling` — scenario modelling, capital stack optimisation, stress testing, lender-pack previews
+```
+Organization (multi-tenant)
+  └─ Workspace (project grouping)
+       └─ Portfolio (individual deal)
+```
 
-## Module 3: Project Dossier Ingestion and Document Intelligence
+- **Runtime**: Next.js 16 App Router, React 19, TypeScript strict mode
+- **Database**: SQLite (better-sqlite3) with WAL mode, PostgreSQL-ready schema (UUIDs, ISO timestamps, standard SQL)
+- **Auth**: JWT (HS256) access tokens (15m) + refresh tokens (7d), bcrypt password hashing (12 rounds)
+- **MFA**: TOTP via otpauth library, 10 hex recovery codes, enrollment + verification flow
+- **Authorization**: RBAC (5 org roles, 3 workspace roles, 18 permissions) + ABAC (deny-first policy evaluation)
+- **Sessions**: SHA-256 token hashing, list/revoke/revoke-all, automatic refresh rotation
+- **SSO**: SAML/OIDC provider configuration surface (stub ready for IdP integration)
+- **Audit**: Central audit log for all CRUD, auth, approval, and export actions
+- **Events**: In-process event bus for notifications and side effects
+- **Styling**: Tailwind CSS 4 with dark theme
 
-The dossier-intelligence surface includes:
+## Live Modules
 
-- bulk upload, email-forwarded intake, and connector-based imports
-- automated document classification, OCR text handling, metadata extraction, and version lineage
-- entity extraction for assets, permits, locations, counterparties, and key dates
-- chunking and knowledge-graph population for downstream retrieval
-- searchable evidence cards with line-level citations back to source chunks
-- red-flag detection and data-completeness checks for diligence gaps
-- AI-generated summaries with explicit human review controls
-- storage lifecycle controls for hot / warm / archive handling
+| Module | Path | Description |
+|--------|------|-------------|
+| **0 - Platform Foundations** | `/admin` | Multi-tenancy, auth, RBAC/ABAC, sessions, MFA, SSO, audit, notifications, tasks |
+| **1 - Deal Radar** | `/deal-radar` | Origination command center, score-based triage, watchlists, committee packs |
+| **3 - Document Intelligence** | `/documents` | Dossier ingestion, classification, entity extraction, evidence cards |
+| **4 - Bankability Scoring** | `/bankability` | Underwriting domains, red-flag governance, readiness scorecards, scenarios |
+| **5 - Financial Modelling** | `/financial-modeling` | Scenario libraries, stress tests, lender packs, comparison APIs |
+| Evidence Workspace | `/evidence` | Evidence-card registry for diligence artefacts |
 
-### APIs
+## Module 0: Platform Foundations & Secure Multi-Tenancy
 
-- `GET /api/documents` — list processed documents with filters for source, review status, and search query
-- `POST /api/documents` — ingest new dossier items or update review / retention actions
-- `GET /api/evidence-cards` — retrieve evidence cards by query and risk level
-- `POST /api/evidence-cards` — server-side evidence retrieval for a supplied query payload
+### Auth API
 
-## Module 4: Bankability Scoring and Risk Engineering
+| Method | Route | Description |
+|--------|-------|-------------|
+| POST | `/api/auth/register` | Create account, returns JWT pair |
+| POST | `/api/auth/login` | Sign in (supports MFA token or recovery code) |
+| POST | `/api/auth/refresh` | Rotate access + refresh tokens |
+| POST | `/api/auth/logout` | Revoke current session |
+| POST | `/api/auth/mfa/enroll` | Get TOTP secret + otpauth URI |
+| POST | `/api/auth/mfa/verify` | Confirm TOTP, enable MFA, receive recovery codes |
 
-The bankability surface includes:
+### Session API
 
-- configurable scoring domains: technical, commercial, financial, regulatory, ESG, execution
-- weighted criteria with evidence mapping
-- red-flag rules and mitigation registers
-- scenario logic for base / downside / upside cases
-- readiness scorecards by project, workstream, and counterparty
-- committee-grade narratives with evidence links
-- issue-to-action workflows with owners and due dates
-- archetype benchmarking and lender-pack export
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/auth/sessions` | List active sessions |
+| DELETE | `/api/auth/sessions` | Revoke all other sessions |
+| DELETE | `/api/auth/sessions/{id}` | Revoke specific session |
 
-### APIs
+### Organization / Workspace / Portfolio API
 
-- `GET /api/bankability/scores` — returns the evaluation payload
-- `GET /api/bankability/scores?mode=downside` — returns a scenario-specific evaluation
-- `GET /api/bankability/scores?format=pack` — returns the board / lender pack payload
-- `GET /api/risk` — returns the risk dashboard and mitigation register
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET/POST | `/api/orgs` | List / create organizations |
+| GET/PATCH/DELETE | `/api/orgs/{orgId}` | Get / update / delete org |
+| GET/POST | `/api/orgs/{orgId}/members` | List / add members |
+| GET/POST | `/api/orgs/{orgId}/workspaces` | List / create workspaces |
+| GET/PATCH/DELETE | `/api/orgs/{orgId}/workspaces/{wsId}` | Workspace CRUD |
+| GET/POST | `/api/orgs/{orgId}/workspaces/{wsId}/portfolios` | List / create portfolios |
+| GET/PATCH/DELETE | `/api/orgs/{orgId}/workspaces/{wsId}/portfolios/{id}` | Portfolio CRUD |
+
+### SSO, Audit, Notifications, Tasks API
+
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET/POST/PATCH | `/api/orgs/{orgId}/sso` | SSO provider CRUD + enable/disable |
+| GET | `/api/orgs/{orgId}/audit` | Query audit logs (filters: userId, action, resourceType, from, to) |
+| GET/PATCH | `/api/notifications` | List / mark-read notifications |
+| GET/POST | `/api/tasks` | List / create tasks |
+| GET/PATCH | `/api/tasks/{id}` | Get / update task |
+
+### RBAC Roles & Permissions
+
+**Organization Roles**: owner, admin, member, viewer, billing
+
+| Permission | Owner | Admin | Member | Viewer | Billing |
+|-----------|-------|-------|--------|--------|---------|
+| org:read | x | x | x | x | x |
+| org:update | x | x | | | |
+| org:delete | x | | | | |
+| org:manage_members | x | x | | | |
+| org:manage_billing | x | | | | x |
+| org:manage_sso | x | x | | | |
+| ws:create | x | x | x | | |
+| ws:read | x | x | x | x | |
+| ws:update | x | x | x | | |
+| ws:delete | x | x | | | |
+| portfolio:create | x | x | x | | |
+| portfolio:read | x | x | x | x | |
+| portfolio:update | x | x | x | | |
+| portfolio:delete | x | x | | | |
+| audit:read | x | x | x | x | |
+| audit:export | x | x | | | |
+
+**Workspace Roles**: admin, editor, viewer
+
+### ABAC Policies
+
+Attribute-based policies stored per-org with deny-first evaluation. Conditions use dot-path matching (e.g., `user.orgRole`, `resource.type`).
 
 ## Development
 
 ```bash
-pnpm dev
+pnpm install
+pnpm dev          # Start dev server at http://localhost:3000
+pnpm seed         # Populate demo data (3 users, 1 org, 2 workspaces, 2 portfolios)
 ```
 
-Open <http://localhost:3000>.
+### Demo Credentials
+
+All demo accounts use password `Atlas2026!`:
+- `admin@atlas.dev` — org owner
+- `analyst@atlas.dev` — org member
+- `viewer@atlas.dev` — org viewer
 
 ## Verification
 
 ```bash
-pnpm lint
-pnpm test
-pnpm build
+pnpm lint         # ESLint
+pnpm test         # Vitest (auth, RBAC, ABAC, sessions, services, scoring, finance, documents)
+pnpm build        # Next.js production build
 ```
 
-Current test coverage includes the bankability engine, scoring layer, deal-radar store, financial modelling services, and document-intelligence workflows.
+## Migration Notes (SQLite → PostgreSQL)
+
+The schema is designed for easy migration:
+- All IDs are TEXT UUIDs (maps to `uuid` in PostgreSQL)
+- Timestamps use ISO 8601 strings (change to `timestamptz`)
+- `datetime('now')` → `NOW()`
+- `INTEGER` booleans → `BOOLEAN`
+- JSON columns stored as TEXT → native `JSONB`
+- WAL pragma → PostgreSQL default MVCC
+- `UNIQUE` constraints and indexes are standard SQL
+
+## Module 3: Document Intelligence
+
+- Bulk upload, email-forwarded intake, connector-based imports
+- Automated classification, OCR, metadata extraction, version lineage
+- Entity extraction for assets, permits, locations, counterparties, dates
+- Chunking and knowledge-graph population
+- Evidence cards with line-level citations
+- Red-flag detection and data-completeness checks
+- AI-generated summaries with human review controls
+
+## Module 4: Bankability Scoring and Risk Engineering
+
+- Configurable scoring domains: technical, commercial, financial, regulatory, ESG, execution
+- Weighted criteria with evidence mapping
+- Red-flag rules and mitigation registers
+- Scenario logic for base/downside/upside cases
+- Readiness scorecards by project, workstream, counterparty
+- Committee-grade narratives with evidence links
