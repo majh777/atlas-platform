@@ -10,6 +10,26 @@ Atlas is a Next.js + TypeScript underwriting workspace for project-finance origi
 - `/bankability` — **Module 4** bankability scoring and risk engineering
 - `/financial-modeling` — scenario modelling, capital stack optimisation, stress testing, lender-pack previews
 
+## Module 3: Project Dossier Ingestion and Document Intelligence
+
+The dossier-intelligence surface includes:
+
+- bulk upload, email-forwarded intake, and connector-based imports
+- automated document classification, OCR text handling, metadata extraction, and version lineage
+- entity extraction for assets, permits, locations, counterparties, and key dates
+- chunking and knowledge-graph population for downstream retrieval
+- searchable evidence cards with line-level citations back to source chunks
+- red-flag detection and data-completeness checks for diligence gaps
+- AI-generated summaries with explicit human review controls
+- storage lifecycle controls for hot / warm / archive handling
+
+### APIs
+
+- `GET /api/documents` — list processed documents with filters for source, review status, and search query
+- `POST /api/documents` — ingest new dossier items or update review / retention actions
+- `GET /api/evidence-cards` — retrieve evidence cards by query and risk level
+- `POST /api/evidence-cards` — server-side evidence retrieval for a supplied query payload
+
 ## Module 4: Bankability Scoring and Risk Engineering
 
 The bankability surface includes:
