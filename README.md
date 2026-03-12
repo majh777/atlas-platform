@@ -30,6 +30,9 @@ Organization (multi-tenant)
 | **3 - Document Intelligence** | `/documents` | Dossier ingestion, classification, entity extraction, evidence cards |
 | **4 - Bankability Scoring** | `/bankability` | Underwriting domains, red-flag governance, readiness scorecards, scenarios |
 | **5 - Financial Modelling** | `/financial-modeling` | Scenario libraries, stress tests, lender packs, comparison APIs |
+| **7 - Execution Digital Twin** | `/execution` | Milestone control, project controls, contractor scorecards, field workflows, procurement tracker, integrated variance reporting |
+| **8 - Asset Intelligence** | `/assets` | Telemetry ingestion, anomaly detection, predictive maintenance, compliance monitoring, efficiency, commercial analytics |
+| **10 - Client / Investor / Operator Portals** | `/portals` | Executive cockpit, investor reporting portal, operator oversight, white-label delivery, exports, notifications |
 | Evidence Workspace | `/evidence` | Evidence-card registry for diligence artefacts |
 
 ## Module 0: Platform Foundations & Secure Multi-Tenancy
@@ -74,6 +77,9 @@ Organization (multi-tenant)
 | GET/PATCH | `/api/notifications` | List / mark-read notifications |
 | GET/POST | `/api/tasks` | List / create tasks |
 | GET/PATCH | `/api/tasks/{id}` | Get / update task |
+| GET/POST | `/api/portals` | List role-based portals / create scheduled report configuration |
+| GET | `/api/dashboards` | Resolve role-aware dashboard bundles with caching |
+| GET/POST | `/api/reports` | List schedules or generate report artifacts / export payloads |
 
 ### RBAC Roles & Permissions
 
@@ -156,3 +162,23 @@ The schema is designed for easy migration:
 - Scenario logic for base/downside/upside cases
 - Readiness scorecards by project, workstream, counterparty
 - Committee-grade narratives with evidence links
+
+## Module 8: Asset Intelligence, Telemetry and Predictive Maintenance
+
+- `/api/assets` for asset registry reads and snapshot analytics
+- `/api/telemetry` for connector ingestion and time-series signal capture
+- `/api/maintenance` for predictive maintenance queue management
+- Connector framework covering CAN bus, SCADA, ERP, and manual telemetry feeds
+- Deterministic anomaly detection, predictive maintenance risk scoring, and alert orchestration
+- Monitoring for utilization, fuel burn, energy draw, throughput, inspection readiness, and revenue performance
+
+## Module 7: Execution Digital Twin & Project Controls
+
+- Digital twin domain model for execution work packages
+- Milestone and schedule management with critical-path visibility
+- Budget, forecast, commitments, estimate-at-completion, and contingency control
+- Contractor performance scorecards and change-order workflow engine
+- Field issue, RFI, and punch-list workflows including mobile-friendly issue logging
+- Procurement tracker for long-lead equipment and on-site readiness monitoring
+- Integrated reporting layer for cost/schedule/procurement/issue variance analysis
+- APIs: `/api/execution`, `/api/milestones`, `/api/issues`

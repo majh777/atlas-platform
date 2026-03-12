@@ -37,6 +37,27 @@ const modules = [
     status: "Live",
   },
   {
+    title: "Module 8 · Asset Intelligence, Telemetry & Predictive Maintenance",
+    href: "/assets",
+    description:
+      "Telemetry ingestion, anomaly detection, predictive maintenance planning, inspection readiness, and fuel/energy/commercial performance analytics.",
+    status: "Live",
+  },
+  {
+    title: "Module 7 · Execution Digital Twin & Project Controls",
+    href: "/execution",
+    description:
+      "Milestones, schedule control, budget and contingency tracking, contractor scorecards, field issue workflows, procurement monitoring, and integrated variance reporting.",
+    status: "New",
+  },
+  {
+    title: "Module 10 · Client, Investor and Operator Portals",
+    href: "/portals",
+    description:
+      "Executive cockpit, investor reporting portal, operator oversight, white-label delivery, scheduled exports, and mobile-responsive action trays.",
+    status: "New",
+  },
+  {
     title: "Evidence workspace",
     href: "/evidence",
     description:
@@ -54,8 +75,8 @@ export default function Home() {
           <h1 className="text-5xl font-semibold tracking-tight">Project finance workflows for investment committee discipline.</h1>
           <p className="text-base leading-8 text-slate-300">
             Atlas is a lender-grade workspace for origination, diligence, bankability scoring, scenario analysis,
-            and exportable decision packs. Module 4 is now wired into the broader product surface alongside the
-            existing deal radar, document intelligence, and financial modelling layers.
+            asset telemetry, and exportable decision packs. Module 8 now extends the stack into operational
+            intelligence alongside deal radar, document intelligence, bankability scoring, and financial modelling.
           </p>
         </section>
 
