@@ -1,0 +1,45 @@
+import type { FinancialScenarioInput } from "@/lib/finance/types";
+
+export const demoScenarios: FinancialScenarioInput[] = [
+  {
+    id: "scenario-base-debt",
+    name: "Senior Debt Base Case",
+    projectName: "Atlas Copper Corridor",
+    fundingStructure: "debt",
+    tenorYears: 7,
+    capexTemplateId: "capex-open-pit",
+    opexTemplateId: "opex-industrial",
+    revenueTemplateId: "revenue-copper-concentrate",
+    financingMix: { debt: 0.65, equity: 0.25, leasing: 0.1 },
+    assumptionsVersion: "2026.01-base",
+    targetDebtAmount: 260_000_000,
+    targetEquityAmount: 100_000_000,
+    targetLeaseAmount: 40_000_000,
+    covenantDefinition: { minDscr: 1.25, maxLeverage: 3.5, minIcRatio: 2 },
+    reviewStatus: "approved",
+    approvals: [
+      { reviewer: "A. Mbiam", role: "Sponsor", status: "approved", timestamp: "2026-03-01T08:00:00Z", comment: "Ready for lender engagement." },
+      { reviewer: "M. Chen", role: "Credit", status: "approved", timestamp: "2026-03-02T12:00:00Z", comment: "Covenants acceptable." },
+    ],
+  },
+  {
+    id: "scenario-blended-growth",
+    name: "Blended Capital Growth Case",
+    projectName: "Atlas Copper Corridor",
+    fundingStructure: "blended",
+    tenorYears: 8,
+    capexTemplateId: "capex-open-pit",
+    opexTemplateId: "opex-industrial",
+    revenueTemplateId: "revenue-copper-concentrate",
+    financingMix: { debt: 0.45, equity: 0.3, leasing: 0.25 },
+    assumptionsVersion: "2026.02-tight-credit",
+    targetDebtAmount: 180_000_000,
+    targetEquityAmount: 140_000_000,
+    targetLeaseAmount: 100_000_000,
+    covenantDefinition: { minDscr: 1.3, maxLeverage: 3.1, minIcRatio: 2.2 },
+    reviewStatus: "pending",
+    approvals: [
+      { reviewer: "S. Ibrahim", role: "Project Finance", status: "pending", timestamp: "2026-03-05T10:30:00Z", comment: "Awaiting independent market study." },
+    ],
+  },
+];
