@@ -25,7 +25,23 @@ const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
 /**
- * Generates an access token and refresh token pair for the given payload.
+ * Generates a JWT access token and refresh token pair for the given payload.
+ * 
+ * Access tokens are short-lived (15 minutes) for security.
+ * Refresh tokens are long-lived (7 days) and should be stored securely.
+ * 
+ * @param payload - User identification data to encode in tokens
+ * @returns Promise resolving to access token, refresh token, and expiration timestamp
+ * 
+ * @example
+ * ```typescript
+ * const tokens = await generateTokens({
+ *   userId: 'user-123',
+ *   email: 'user@example.com',
+ *   sessionId: 'session-456'
+ * });
+ * // Returns: { accessToken, refreshToken, expiresAt }
+ * ```
  */
 export async function generateTokens(payload: TokenPayload): Promise<TokenSet> {
   const now = Math.floor(Date.now() / 1000);
@@ -51,7 +67,24 @@ export async function generateTokens(payload: TokenPayload): Promise<TokenSet> {
 }
 
 /**
- * Verifies and decodes an access token. Throws on invalid/expired tokens.
+ * Verifies and decodes a JWT access token.
+ * 
+ * Validates the token signature, expiration, and issuer claim.
+ * Throws an error if the token is invalid, expired, or tampered with.
+ * 
+ * @param token - The JWT access token string to verify
+ * @returns Promise resolving to the decoded token payload
+ * @throws Error if token is invalid, expired, or has wrong issuer
+ * 
+ * @example
+ * ```typescript
+ * try {
+ *   const payload = await verifyAccessToken(token);
+ *   console.log(payload.userId, payload.email);
+ * } catch (error) {
+ *   // Token is invalid or expired
+ * }
+ * ```
  */
 export async function verifyAccessToken(token: string): Promise<JWTPayload & TokenPayload> {
   const { payload } = await jwtVerify(token, JWT_SECRET, {

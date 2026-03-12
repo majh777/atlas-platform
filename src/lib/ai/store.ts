@@ -17,8 +17,14 @@ export async function readAiStore(): Promise<AiModuleStore> {
     return JSON.parse(contents) as AiModuleStore;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    if (message.includes('ENOENT')) {
-      await writeAiStore(emptyStore);
+    // Handle file not found or corrupted JSON (e.g., from concurrent writes)
+    if (message.includes('ENOENT') || message.includes('JSON')) {
+      // Initialize with empty store to recover from corruption
+      try {
+        await writeAiStore(emptyStore);
+      } catch {
+        // Ignore write errors during recovery
+      }
       return emptyStore;
     }
     throw error;

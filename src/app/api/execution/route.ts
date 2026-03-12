@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, type AuthenticatedRequest } from '@/lib/auth/middleware';
 import { advanceChangeOrder, createChangeOrder, getExecutionTwin } from '@/lib/execution/service';
 import type { ChangeOrderStatus } from '@/lib/execution/types';
 
-export async function GET() {
+async function handleGet(_request: NextRequest, _auth: AuthenticatedRequest) {
   return NextResponse.json(getExecutionTwin());
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   const body = await request.json().catch(() => ({}));
 
   if (body.action === 'advanceChangeOrder') {
@@ -32,3 +33,6 @@ export async function POST(request: Request) {
   const changeOrder = createChangeOrder(body);
   return NextResponse.json({ changeOrder }, { status: 201 });
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

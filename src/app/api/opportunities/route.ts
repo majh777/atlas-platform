@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, type AuthenticatedRequest } from '@/lib/auth/middleware';
 import { opportunityStore } from '@/lib/opportunity-store';
 import type { OpportunityInput } from '@/types/opportunity';
 
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
   const opportunities = opportunityStore.list({
     q: searchParams.get('q') ?? undefined,
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ data: opportunities, total: opportunities.length });
 }
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   const body = await request.json();
 
   if (body.kind === 'signal') {
@@ -26,3 +27,6 @@ export async function POST(request: NextRequest) {
   const opportunity = opportunityStore.create(body as OpportunityInput);
   return NextResponse.json({ data: opportunity }, { status: 201 });
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

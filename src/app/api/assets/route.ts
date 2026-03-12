@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth, type AuthenticatedRequest } from "@/lib/auth/middleware";
 import { createAsset, getAssetSnapshot, listAssets } from "@/lib/assets/service";
 
-export async function GET(request: Request) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
 
   if (searchParams.get("snapshot") === "true") {
@@ -16,7 +17,7 @@ export async function GET(request: Request) {
   return NextResponse.json({ assets });
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   try {
     const body = await request.json();
     const required = ["name", "site", "category", "className", "owner"];
@@ -46,3 +47,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 400 });
   }
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

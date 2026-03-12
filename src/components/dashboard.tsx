@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Activity, Building2, FileText, Globe2, Signal, Users2 } from 'lucide-react';
 import { buildCommitteePack, getCrmSyncHooks, opportunityStore } from '@/lib/opportunity-store';
 import { probabilityWeightedValue } from '@/lib/scoring';
@@ -5,6 +6,10 @@ import type { Opportunity } from '@/types/opportunity';
 import { MetricCard } from '@/components/finance/metric-card';
 import { Card, Pill, SectionTitle } from '@/components/ui';
 
+/**
+ * Aggregate opportunities by a given property
+ * Memoize at call site for performance
+ */
 function aggregate<T extends string>(items: Opportunity[], getter: (item: Opportunity) => T) {
   return Object.entries(
     items.reduce<Record<string, number>>((acc, item) => {
@@ -17,8 +22,13 @@ function aggregate<T extends string>(items: Opportunity[], getter: (item: Opport
     .map(([label, value]) => ({ label, value }));
 }
 
-function HeatGrid({ title, data }: { title: string; data: Array<{ label: string; value: number }> }) {
-  const max = Math.max(...data.map((item) => item.value), 1);
+/**
+ * Performance-optimized HeatGrid component
+ * Uses memo + useMemo for max calculation
+ */
+const HeatGrid = memo(function HeatGrid({ title, data }: { title: string; data: Array<{ label: string; value: number }> }) {
+  const max = useMemo(() => Math.max(...data.map((item) => item.value), 1), [data]);
+  
   return (
     <Card>
       <div className="mb-4 flex items-center justify-between">
@@ -42,9 +52,13 @@ function HeatGrid({ title, data }: { title: string; data: Array<{ label: string;
       </div>
     </Card>
   );
-}
+});
 
-function PipelineTable({ opportunities }: { opportunities: Opportunity[] }) {
+/**
+ * Performance-optimized PipelineTable component
+ * Uses memo to prevent re-renders when opportunities haven't changed
+ */
+const PipelineTable = memo(function PipelineTable({ opportunities }: { opportunities: Opportunity[] }) {
   return (
     <Card className="overflow-hidden">
       <div className="mb-4 flex items-center justify-between">
@@ -82,7 +96,7 @@ function PipelineTable({ opportunities }: { opportunities: Opportunity[] }) {
       </div>
     </Card>
   );
-}
+});
 
 function IntakeFormPreview() {
   return (
@@ -132,18 +146,27 @@ function CommitteePackPanel({ opportunity }: { opportunity: Opportunity }) {
   );
 }
 
+/**
+ * Performance-optimized DealRadarDashboard
+ * Uses useMemo for all expensive calculations
+ */
 export function DealRadarDashboard() {
   const opportunities = opportunityStore.list();
-  const totals = {
+  
+  // Memoize totals calculation
+  const totals = useMemo(() => ({
     total: opportunities.length,
     weighted: opportunities.reduce((sum, item) => sum + probabilityWeightedValue(item.estimatedValueUsd, item.probability), 0),
     watchlist: opportunities.filter((item) => item.watchlist).length,
     hot: opportunities.filter((item) => item.triageQueue === 'Hot').length,
-  };
+  }), [opportunities]);
 
-  const countryMap = aggregate(opportunities, (item) => item.country);
-  const sectorMap = aggregate(opportunities, (item) => item.sector);
-  const sponsorMap = aggregate(opportunities, (item) => item.sponsorType);
+  // Memoize aggregation calculations
+  const [countryMap, sectorMap, sponsorMap] = useMemo(() => [
+    aggregate(opportunities, (item) => item.country),
+    aggregate(opportunities, (item) => item.sector),
+    aggregate(opportunities, (item) => item.sponsorType),
+  ], [opportunities]);
 
   return (
     <div className="space-y-8">

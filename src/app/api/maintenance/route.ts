@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth, type AuthenticatedRequest } from "@/lib/auth/middleware";
 import { listMaintenance, updateMaintenanceTask } from "@/lib/assets/service";
 
-export async function GET(request: Request) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
   const maintenance = await listMaintenance((searchParams.get("status") as never) ?? undefined);
   return NextResponse.json({ maintenance });
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   try {
     const body = await request.json();
     if (!body.taskId || !body.status) {
@@ -20,3 +21,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 400 });
   }
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

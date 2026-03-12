@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, type AuthenticatedRequest } from '@/lib/auth/middleware';
 import { listPortals, scheduleReport } from '@/lib/portals/store';
 import type { PortalRole, ReportFormat } from '@/types/portal';
 
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
   const role = (searchParams.get('role') as PortalRole | null) ?? undefined;
   const data = listPortals(role);
   return NextResponse.json({ data, total: data.length });
 }
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   const body = await request.json();
   const scheduled = scheduleReport({
     portalId: body.portalId,
@@ -22,3 +23,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ data: scheduled }, { status: 201 });
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

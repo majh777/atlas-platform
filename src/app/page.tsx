@@ -32,9 +32,8 @@ const stagger = {
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => setMounted(true), []);
-
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional hydration guard
+  useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
   return (

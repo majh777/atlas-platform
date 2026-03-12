@@ -68,6 +68,24 @@ function buildDomainNarrative(domain: BankabilityDomainKey, average: number, fla
   return `${domain.toUpperCase()} is ${posture} at ${average.toFixed(1)}/100 with ${coverage.toFixed(1)} evidence coverage. ${flagText}`;
 }
 
+/**
+ * Calculates weighted scores for each bankability domain.
+ * 
+ * Evaluates six domains: technical, commercial, financial, regulatory, ESG, and execution.
+ * Each domain score is computed from weighted criteria adjusted for the selected scenario.
+ * 
+ * @param context - The evaluation context containing scoring model, evidence, and issues
+ * @param scenario - The scenario definition with adjustment factors
+ * @returns Array of domain scores with weighted averages, evidence coverage, and narratives
+ * 
+ * @example
+ * ```typescript
+ * const context = getAtlasBankabilityContext();
+ * const scenario = scenarios.find(s => s.mode === 'base');
+ * const scores = calculateDomainScores(context, scenario);
+ * // Returns: [{ domain: 'technical', weightedScore: 82.3, ... }, ...]
+ * ```
+ */
 export function calculateDomainScores(
   context: EvaluationContext,
   scenario: ScenarioDefinition,
@@ -265,6 +283,29 @@ ${context.mitigations
 `;
 }
 
+/**
+ * Performs a comprehensive bankability evaluation for the current project.
+ * 
+ * This is the main entry point for bankability scoring. It evaluates all six domains,
+ * detects red flags, generates readiness scorecards, runs scenario analysis, and
+ * produces committee-grade narratives.
+ * 
+ * @param mode - The scenario mode to evaluate: 'base', 'downside', or 'upside'
+ * @returns Complete bankability evaluation including scores, red flags, scenarios, and narratives
+ * 
+ * @example
+ * ```typescript
+ * // Get base case evaluation
+ * const evaluation = evaluateBankability('base');
+ * console.log(`Overall score: ${evaluation.overallScore}/100`);
+ * console.log(`Red flags: ${evaluation.redFlags.length}`);
+ * 
+ * // Check for downside resilience
+ * const downside = evaluateBankability('downside');
+ * const delta = downside.overallScore - evaluation.overallScore;
+ * console.log(`Downside impact: ${delta} points`);
+ * ```
+ */
 export function evaluateBankability(mode: ScenarioMode = "base"): BankabilityEvaluation {
   const context = getAtlasBankabilityContext();
   const scenario = scenarios.find((item) => item.mode === mode) ?? scenarios[0];

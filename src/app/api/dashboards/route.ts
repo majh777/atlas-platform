@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, type AuthenticatedRequest } from '@/lib/auth/middleware';
 import { getDashboardBundle } from '@/lib/portals/store';
 import type { PortalRole } from '@/types/portal';
 
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
   const role = (searchParams.get('role') as PortalRole | null) ?? 'executive';
   const workspaceId = searchParams.get('workspaceId') ?? undefined;
@@ -14,3 +15,5 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ data: dashboard, cached: true });
 }
+
+export const GET = withAuth(handleGet);

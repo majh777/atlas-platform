@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth, type AuthenticatedRequest } from "@/lib/auth/middleware";
 import {
   ingestDocuments,
   listDocuments,
@@ -7,7 +8,7 @@ import {
 } from "@/lib/document-intelligence/service";
 import type { IngestRequestDocument, ReviewStatus, StorageClass } from "@/types/document-intelligence";
 
-export async function GET(request: Request) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
   const documents = await listDocuments({
     query: searchParams.get("q") ?? undefined,
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
   return NextResponse.json({ documents });
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   try {
     const body = await request.json();
 
@@ -54,3 +55,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

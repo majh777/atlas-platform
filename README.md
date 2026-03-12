@@ -1,8 +1,87 @@
 # Atlas
 
+**Bankability & Asset Intelligence Operating System**
+
 Atlas is a Next.js + TypeScript underwriting workspace for project-finance origination, diligence, bankability scoring, and lender-facing decision support.
 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/your-org/atlas/ci.yml?branch=main)](https://github.com/your-org/atlas/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
+
+---
+
+## Overview
+
+Atlas provides a comprehensive platform for infrastructure and project finance teams to manage the entire deal lifecycle:
+
+- **Deal Origination** — Pipeline management with scoring and triage
+- **Document Intelligence** — Automated ingestion, classification, and evidence extraction
+- **Bankability Scoring** — Multi-domain risk assessment with scenario analysis
+- **Financial Modeling** — Scenario libraries, stress testing, and lender packs
+- **Execution Tracking** — Digital twin for project controls
+- **Asset Intelligence** — Telemetry, anomaly detection, and predictive maintenance
+- **ESG & Compliance** — Permit tracking, obligations, and incident management
+- **AI Copilots** — Evidence-grounded search and narrative generation
+
+## Quick Start
+
+```bash
+# Prerequisites: Node.js 20+, pnpm
+
+# Clone and install
+git clone https://github.com/your-org/atlas.git
+cd atlas
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Open http://localhost:3000
+```
+
+### Demo Credentials
+
+After seeding (`pnpm seed`), use these accounts:
+
+| Email | Password | Role |
+|-------|----------|------|
+| `admin@atlas.dev` | `Atlas2026!` | org owner |
+| `analyst@atlas.dev` | `Atlas2026!` | org member |
+| `viewer@atlas.dev` | `Atlas2026!` | org viewer |
+
+---
+
 ## Architecture
+
+### System Design
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                           Atlas Platform                             │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐  │
+│  │   Next.js   │  │   React     │  │  Tailwind   │  │   Framer   │  │
+│  │  App Router │  │     19      │  │    CSS 4    │  │   Motion   │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘  │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                    Business Logic Layer                      │    │
+│  │  ┌─────────┐ ┌──────────┐ ┌─────────┐ ┌──────────┐          │    │
+│  │  │  Auth   │ │ Scoring  │ │ Finance │ │    AI    │   ...    │    │
+│  │  └─────────┘ └──────────┘ └─────────┘ └──────────┘          │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                      Data Layer                              │    │
+│  │  ┌──────────────────┐  ┌──────────────────────────────────┐ │    │
+│  │  │  SQLite (WAL)    │  │  PostgreSQL Ready (production)   │ │    │
+│  │  └──────────────────┘  └──────────────────────────────────┘ │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Model
 
 ```
 Organization (multi-tenant)
@@ -10,208 +89,267 @@ Organization (multi-tenant)
        └─ Portfolio (individual deal)
 ```
 
-- **Runtime**: Next.js 16 App Router, React 19, TypeScript strict mode
-- **Database**: SQLite (better-sqlite3) with WAL mode, PostgreSQL-ready schema (UUIDs, ISO timestamps, standard SQL)
-- **Auth**: JWT (HS256) access tokens (15m) + refresh tokens (7d), bcrypt password hashing (12 rounds)
-- **MFA**: TOTP via otpauth library, 10 hex recovery codes, enrollment + verification flow
-- **Authorization**: RBAC (5 org roles, 3 workspace roles, 18 permissions) + ABAC (deny-first policy evaluation)
-- **Sessions**: SHA-256 token hashing, list/revoke/revoke-all, automatic refresh rotation
-- **SSO**: SAML/OIDC provider configuration surface (stub ready for IdP integration)
-- **Audit**: Central audit log for all CRUD, auth, approval, and export actions
-- **Events**: In-process event bus for notifications and side effects
-- **Styling**: Tailwind CSS 4 with dark theme
+### Technology Stack
 
-## Live Modules
+| Layer | Technology |
+|-------|------------|
+| Runtime | Next.js 16, React 19, TypeScript (strict) |
+| Styling | Tailwind CSS 4, Framer Motion |
+| Database | SQLite (better-sqlite3) with WAL mode, PostgreSQL-ready |
+| Auth | JWT (HS256), bcrypt (12 rounds), TOTP MFA |
+| Authorization | RBAC (5 org roles, 3 workspace roles) + ABAC |
+
+---
+
+## Modules
+
+Atlas consists of 12 integrated modules:
 
 | Module | Path | Description |
 |--------|------|-------------|
-| **0 - Platform Foundations** | `/admin` | Multi-tenancy, auth, RBAC/ABAC, sessions, MFA, SSO, audit, notifications, tasks |
-| **1 - Deal Radar** | `/deal-radar` | Origination command center, score-based triage, watchlists, committee packs |
-| **3 - Document Intelligence** | `/documents` | Dossier ingestion, classification, entity extraction, evidence cards |
-| **4 - Bankability Scoring** | `/bankability` | Underwriting domains, red-flag governance, readiness scorecards, scenarios |
-| **5 - Financial Modelling** | `/financial-modeling` | Scenario libraries, stress tests, lender packs, comparison APIs |
-| **7 - Execution Digital Twin** | `/execution` | Milestone control, project controls, contractor scorecards, field workflows, procurement tracker, integrated variance reporting |
-| **8 - Asset Intelligence** | `/assets` | Telemetry ingestion, anomaly detection, predictive maintenance, compliance monitoring, efficiency, commercial analytics |
-| **10 - Client / Investor / Operator Portals** | `/portals` | Executive cockpit, investor reporting portal, operator oversight, white-label delivery, exports, notifications |
-| **12 - DevSecOps & Enterprise Ops** | `/support-console` | Release controls, deployment automation, runbooks, incident command, observability, and QA guardrails |
-| Evidence Workspace | `/evidence` | Evidence-card registry for diligence artefacts |
+| **0 - Platform** | `/admin` | Multi-tenancy, auth, RBAC/ABAC, sessions, MFA, SSO, audit |
+| **1 - Deal Radar** | `/deal-radar` | Origination command center, scoring, committee packs |
+| **3 - Document Intelligence** | `/documents` | Classification, OCR, entity extraction, evidence cards |
+| **4 - Bankability Scoring** | `/bankability` | Six-domain scoring, red flags, scenarios |
+| **5 - Financial Modeling** | `/financial-modeling` | Scenarios, stress tests, lender packs |
+| **6 - Data Room** | API only | Secure document sharing with watermarking |
+| **7 - Execution Twin** | `/execution` | Milestones, cost control, issues, change orders |
+| **8 - Asset Intelligence** | `/assets` | Telemetry, anomaly detection, predictive maintenance |
+| **9 - ESG & Permitting** | `/esg` | Permits, obligations, incidents, compliance |
+| **10 - Portals** | `/portals` | Executive, investor, operator dashboards |
+| **11 - AI Copilots** | `/ai` | Search, narratives, diligence assistant |
+| **12 - DevSecOps** | `/support-console` | Releases, deployments, incidents, runbooks |
 
-## Module 0: Platform Foundations & Secure Multi-Tenancy
+→ See [MODULES.md](docs/MODULES.md) for detailed documentation.
 
-### Auth API
+---
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| POST | `/api/auth/register` | Create account, returns JWT pair |
-| POST | `/api/auth/login` | Sign in (supports MFA token or recovery code) |
-| POST | `/api/auth/refresh` | Rotate access + refresh tokens |
-| POST | `/api/auth/logout` | Revoke current session |
-| POST | `/api/auth/mfa/enroll` | Get TOTP secret + otpauth URI |
-| POST | `/api/auth/mfa/verify` | Confirm TOTP, enable MFA, receive recovery codes |
+## API Reference
 
-### Session API
+### Authentication
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/api/auth/sessions` | List active sessions |
-| DELETE | `/api/auth/sessions` | Revoke all other sessions |
-| DELETE | `/api/auth/sessions/{id}` | Revoke specific session |
+```bash
+# Register
+POST /api/auth/register
+{ "email": "user@example.com", "password": "...", "displayName": "User" }
 
-### Organization / Workspace / Portfolio API
+# Login
+POST /api/auth/login
+{ "email": "user@example.com", "password": "..." }
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET/POST | `/api/orgs` | List / create organizations |
-| GET/PATCH/DELETE | `/api/orgs/{orgId}` | Get / update / delete org |
-| GET/POST | `/api/orgs/{orgId}/members` | List / add members |
-| GET/POST | `/api/orgs/{orgId}/workspaces` | List / create workspaces |
-| GET/PATCH/DELETE | `/api/orgs/{orgId}/workspaces/{wsId}` | Workspace CRUD |
-| GET/POST | `/api/orgs/{orgId}/workspaces/{wsId}/portfolios` | List / create portfolios |
-| GET/PATCH/DELETE | `/api/orgs/{orgId}/workspaces/{wsId}/portfolios/{id}` | Portfolio CRUD |
+# Returns: { accessToken, refreshToken, expiresAt }
+```
 
-### SSO, Audit, Notifications, Tasks API
+### Resources
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET/POST/PATCH | `/api/orgs/{orgId}/sso` | SSO provider CRUD + enable/disable |
-| GET | `/api/orgs/{orgId}/audit` | Query audit logs (filters: userId, action, resourceType, from, to) |
-| GET/PATCH | `/api/notifications` | List / mark-read notifications |
-| GET/POST | `/api/tasks` | List / create tasks |
-| GET/PATCH | `/api/tasks/{id}` | Get / update task |
-| GET/POST | `/api/portals` | List role-based portals / create scheduled report configuration |
-| GET | `/api/dashboards` | Resolve role-aware dashboard bundles with caching |
-| GET/POST | `/api/reports` | List schedules or generate report artifacts / export payloads |
+```bash
+# Organizations
+GET    /api/orgs
+POST   /api/orgs
+GET    /api/orgs/{orgId}
+PATCH  /api/orgs/{orgId}
+DELETE /api/orgs/{orgId}
 
-### RBAC Roles & Permissions
+# Workspaces
+GET    /api/orgs/{orgId}/workspaces
+POST   /api/orgs/{orgId}/workspaces
 
-**Organization Roles**: owner, admin, member, viewer, billing
+# Portfolios
+GET    /api/orgs/{orgId}/workspaces/{wsId}/portfolios
+POST   /api/orgs/{orgId}/workspaces/{wsId}/portfolios
+```
 
-| Permission | Owner | Admin | Member | Viewer | Billing |
-|-----------|-------|-------|--------|--------|---------|
-| org:read | x | x | x | x | x |
-| org:update | x | x | | | |
-| org:delete | x | | | | |
-| org:manage_members | x | x | | | |
-| org:manage_billing | x | | | | x |
-| org:manage_sso | x | x | | | |
-| ws:create | x | x | x | | |
-| ws:read | x | x | x | x | |
-| ws:update | x | x | x | | |
-| ws:delete | x | x | | | |
-| portfolio:create | x | x | x | | |
-| portfolio:read | x | x | x | x | |
-| portfolio:update | x | x | x | | |
-| portfolio:delete | x | x | | | |
-| audit:read | x | x | x | x | |
-| audit:export | x | x | | | |
+→ See [API.md](docs/API.md) for complete API documentation.
 
-**Workspace Roles**: admin, editor, viewer
-
-### ABAC Policies
-
-Attribute-based policies stored per-org with deny-first evaluation. Conditions use dot-path matching (e.g., `user.orgRole`, `resource.type`).
+---
 
 ## Development
 
+### Commands
+
 ```bash
-pnpm install
-pnpm dev          # Start dev server at http://localhost:3000
-pnpm seed         # Populate demo data (3 users, 1 org, 2 workspaces, 2 portfolios)
+pnpm dev          # Start development server
+pnpm build        # Production build
+pnpm test         # Run tests
+pnpm lint         # Lint code
+pnpm seed         # Seed demo data
 ```
 
-### Demo Credentials
+### Project Structure
 
-All demo accounts use password `Atlas2026!`:
-- `admin@atlas.dev` — org owner
-- `analyst@atlas.dev` — org member
-- `viewer@atlas.dev` — org viewer
+```
+atlas/
+├── src/
+│   ├── app/           # Next.js pages and API routes
+│   ├── components/    # React components
+│   ├── lib/           # Business logic
+│   └── types/         # TypeScript types
+├── tests/             # Test files
+├── docs/              # Documentation
+└── data/              # Demo data
+```
+
+### Testing
+
+```bash
+# Run all tests
+pnpm test
+
+# Run specific test
+pnpm test tests/auth.test.ts
+
+# With coverage
+pnpm test -- --coverage
+```
+
+→ See [DEVELOPMENT.md](docs/DEVELOPMENT.md) for detailed development guide.
+
+---
+
+## Security
+
+### Authentication Features
+
+- **JWT tokens**: 15-minute access tokens, 7-day refresh tokens
+- **Password hashing**: bcrypt with 12 rounds
+- **MFA**: TOTP-based with recovery codes
+- **Session management**: List, revoke, secure storage
+
+### Authorization
+
+- **RBAC**: 5 organization roles, 3 workspace roles, 18 permissions
+- **ABAC**: Attribute-based policies with deny-first evaluation
+
+### AI Security
+
+- Prompt injection detection
+- PII redaction (SSN, credit cards, emails)
+- XSS sanitization
+- Reviewer mode controls
+
+→ See [SECURITY.md](docs/SECURITY.md) for complete security documentation.
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Deploy to Vercel
+vercel
+
+# Set environment variables
+vercel env add JWT_SECRET production
+vercel env add REFRESH_SECRET production
+
+# Deploy to production
+vercel --prod
+```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `JWT_SECRET` | Yes | JWT signing secret (32+ chars) |
+| `REFRESH_SECRET` | Yes | Refresh token secret (32+ chars) |
+| `DATABASE_URL` | Production | PostgreSQL connection string |
+
+→ See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete deployment guide.
+
+---
+
+## Database Migration
+
+Atlas uses SQLite for development with a PostgreSQL-ready schema.
+
+### SQLite → PostgreSQL
+
+| SQLite | PostgreSQL |
+|--------|------------|
+| `TEXT` (UUID) | `uuid` |
+| `TEXT` (timestamp) | `timestamptz` |
+| `INTEGER` (boolean) | `boolean` |
+| `TEXT` (JSON) | `jsonb` |
+| `datetime('now')` | `NOW()` |
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [API.md](docs/API.md) | Complete API reference |
+| [MODULES.md](docs/MODULES.md) | Module documentation |
+| [SECURITY.md](docs/SECURITY.md) | Security model |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guide |
+| [DEVELOPMENT.md](docs/DEVELOPMENT.md) | Development setup |
+
+---
 
 ## Verification
 
 ```bash
+# Quality checks
 pnpm lint         # ESLint
-pnpm test         # Vitest (auth, RBAC, ABAC, sessions, services, scoring, finance, documents)
-pnpm build        # Next.js production build
+pnpm test         # Vitest
+pnpm build        # Next.js build
+
+# All checks pass before commit
 ```
 
-## Migration Notes (SQLite → PostgreSQL)
+---
 
-The schema is designed for easy migration:
-- All IDs are TEXT UUIDs (maps to `uuid` in PostgreSQL)
-- Timestamps use ISO 8601 strings (change to `timestamptz`)
-- `datetime('now')` → `NOW()`
-- `INTEGER` booleans → `BOOLEAN`
-- JSON columns stored as TEXT → native `JSONB`
-- WAL pragma → PostgreSQL default MVCC
-- `UNIQUE` constraints and indexes are standard SQL
+## Architecture Diagram
 
-## Module 3: Document Intelligence
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        UI[Web UI]
+        Mobile[Mobile App]
+    end
+    
+    subgraph "API Layer"
+        Auth[Auth Service]
+        API[REST API]
+    end
+    
+    subgraph "Business Logic"
+        Scoring[Bankability Engine]
+        Finance[Financial Modeling]
+        DocInt[Document Intelligence]
+        Assets[Asset Intelligence]
+        AI[AI Copilots]
+    end
+    
+    subgraph "Data Layer"
+        DB[(Database)]
+        Cache[Cache]
+    end
+    
+    UI --> Auth
+    Mobile --> Auth
+    Auth --> API
+    API --> Scoring
+    API --> Finance
+    API --> DocInt
+    API --> Assets
+    API --> AI
+    Scoring --> DB
+    Finance --> DB
+    DocInt --> DB
+    Assets --> DB
+    AI --> DB
+```
 
-- Bulk upload, email-forwarded intake, connector-based imports
-- Automated classification, OCR, metadata extraction, version lineage
-- Entity extraction for assets, permits, locations, counterparties, dates
-- Chunking and knowledge-graph population
-- Evidence cards with line-level citations
-- Red-flag detection and data-completeness checks
-- AI-generated summaries with human review controls
+---
 
-## Module 4: Bankability Scoring and Risk Engineering
+## License
 
-- Configurable scoring domains: technical, commercial, financial, regulatory, ESG, execution
-- Weighted criteria with evidence mapping
-- Red-flag rules and mitigation registers
-- Scenario logic for base/downside/upside cases
-- Readiness scorecards by project, workstream, counterparty
-- Committee-grade narratives with evidence links
+Proprietary. All rights reserved.
 
-## Module 9: ESG, Permitting, Community and Regulatory Controls
+---
 
-- Permit register with expiry-watch classification and alert windows
-- Obligation / commitment tracker for permit, regulatory, ESG, and community actions
-- Community issue and grievance workflow with sensitive-case handling
-- ESG incident register with severity-based escalation and corrective-action routing
-- Regulatory reporting packs and evidence bundles with template sections
-- Local-content and stakeholder-engagement metrics in the same operating surface
+## Support
 
-### Module 9 API
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET/POST | `/api/permits` | Permit register dashboard, create permits or linked obligations |
-| GET/PATCH | `/api/permits/{id}` | Retrieve or update permit / obligation (`?entityType=obligation`) |
-| GET/POST | `/api/esg` | ESG dashboard, create obligations, community cases, report packs, actions, metrics |
-| GET/PATCH | `/api/esg/{id}` | Retrieve/update community case, obligation, or action |
-| GET/POST | `/api/incidents` | Incident dashboard, create incidents or incident actions |
-| GET/PATCH | `/api/incidents/{id}` | Retrieve/update incident or linked action |
-
-## Module 12: DevSecOps, Observability, QA and Enterprise Operations
-
-- `/api/deploy` for environment-aware deployment plans, status transitions, and rollback markers
-- `/api/releases` for release approvals, scheduling, release manifests, and rollback version control
-- `/api/incidents?domain=enterprise` for support / platform incidents, incident command, customer updates, and runbook linkage
-- `/api/runbooks` for the enterprise runbook repository backing `docs/runbooks/`
-- `.github/workflows/ci.yml` and `.github/workflows/release.yml` for CI/CD, CodeQL security scanning, quality gates, and controlled promotions
-- `infra/terraform/main.tf` for infrastructure-as-code release controls and environment metadata
-- `observability/dashboards/*.json` for dashboard integration points and tracing / alert contract definitions
-- `scripts/security/rotate-secrets-check.mjs` for secrets-rotation gate hooks in the release pipeline
-- `tests/module12-devsecops.test.ts` for regression, performance, resilience, and security governance coverage
-
-## Module 8: Asset Intelligence, Telemetry and Predictive Maintenance
-
-- `/api/assets` for asset registry reads and snapshot analytics
-- `/api/telemetry` for connector ingestion and time-series signal capture
-- `/api/maintenance` for predictive maintenance queue management
-- Connector framework covering CAN bus, SCADA, ERP, and manual telemetry feeds
-- Deterministic anomaly detection, predictive maintenance risk scoring, and alert orchestration
-- Monitoring for utilization, fuel burn, energy draw, throughput, inspection readiness, and revenue performance
-
-## Module 7: Execution Digital Twin & Project Controls
-
-- Digital twin domain model for execution work packages
-- Milestone and schedule management with critical-path visibility
-- Budget, forecast, commitments, estimate-at-completion, and contingency control
-- Contractor performance scorecards and change-order workflow engine
-- Field issue, RFI, and punch-list workflows including mobile-friendly issue logging
-- Procurement tracker for long-lead equipment and on-site readiness monitoring
-- Integrated reporting layer for cost/schedule/procurement/issue variance analysis
-- APIs: `/api/execution`, `/api/milestones`, `/api/issues`
+For support, please contact the development team through appropriate channels.

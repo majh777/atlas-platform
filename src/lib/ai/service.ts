@@ -37,7 +37,79 @@ interface CorpusEntry {
   metadata: Record<string, string | number | boolean | null>;
 }
 
-const BLOCKED_PATTERNS = [/ignore previous instructions/i, /system prompt/i, /reveal secrets/i, /disable guardrails/i];
+// Extended prompt injection detection patterns
+const BLOCKED_PATTERNS = [
+  /ignore previous instructions/i,
+  /system prompt/i,
+  /reveal secrets/i,
+  /disable guardrails/i,
+  /ignore all previous/i,
+  /developer mode/i,
+  /debug mode/i,
+  /admin mode/i,
+  /bypass security/i,
+  /you are now/i,
+  /pretend you are/i,
+  /act as if/i,
+  /\{"role":\s*"system"/i,
+  /\[system\]/i,
+  /<system>/i,
+  /```\s*\n?\s*ignore/i,
+  /---\s*\n?\s*system/i,
+  /jailbreak/i,
+  /dan mode/i,
+  /no ethical guidelines/i,
+];
+
+// PII patterns for sanitization
+const PII_PATTERNS = [
+  { pattern: /\b\d{3}-\d{2}-\d{4}\b/g, replacement: '[SSN REDACTED]' }, // SSN
+  { pattern: /\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b/g, replacement: '[CARD REDACTED]' }, // Credit card
+  { pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, replacement: '[EMAIL REDACTED]' }, // Email in sensitive contexts
+];
+
+// XSS/HTML sanitization
+const XSS_PATTERNS = [
+  { pattern: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, replacement: '[SCRIPT REMOVED]' },
+  { pattern: /<[^>]*on\w+\s*=/gi, replacement: '<' }, // Event handlers
+  { pattern: /javascript:/gi, replacement: '' },
+];
+
+const VALID_REVIEWER_MODES: ReviewerMode[] = ['draft', 'review_required', 'evidence_only'];
+
+const MAX_QUERY_LENGTH = 5000;
+const MAX_RESULTS = 50;
+
+function sanitizeText(text: string): string {
+  let sanitized = text;
+  // Remove XSS patterns
+  for (const { pattern, replacement } of XSS_PATTERNS) {
+    sanitized = sanitized.replace(pattern, replacement);
+  }
+  return sanitized;
+}
+
+function sanitizePII(text: string): string {
+  let sanitized = text;
+  for (const { pattern, replacement } of PII_PATTERNS) {
+    sanitized = sanitized.replace(pattern, replacement);
+  }
+  return sanitized;
+}
+
+function validateReviewerMode(mode: unknown): ReviewerMode {
+  if (typeof mode === 'string' && VALID_REVIEWER_MODES.includes(mode as ReviewerMode)) {
+    return mode as ReviewerMode;
+  }
+  return 'review_required';
+}
+
+function truncateQuery(query: string): string {
+  if (query.length > MAX_QUERY_LENGTH) {
+    return query.slice(0, MAX_QUERY_LENGTH);
+  }
+  return query;
+}
 
 function tokenize(value: string): string[] {
   return Array.from(new Set(value.toLowerCase().split(/[^a-z0-9]+/).filter((token) => token.length > 2)));
@@ -54,7 +126,16 @@ function overlapScore(query: string, text: string): number {
 }
 
 function summarizeExcerpt(text: string, query: string) {
-  const normalized = text.replace(/\s+/g, ' ').trim();
+  // First sanitize the text to remove any dangerous content
+  let normalized = sanitizeText(text);
+  normalized = sanitizePII(normalized);
+  normalized = normalized.replace(/\s+/g, ' ').trim();
+  
+  // Remove potential prompt injection patterns from document content
+  for (const pattern of BLOCKED_PATTERNS) {
+    normalized = normalized.replace(pattern, '[FILTERED]');
+  }
+  
   if (normalized.length <= 220) return normalized;
   const idx = normalized.toLowerCase().indexOf(query.toLowerCase());
   if (idx === -1) return `${normalized.slice(0, 217)}...`;
@@ -64,13 +145,29 @@ function summarizeExcerpt(text: string, query: string) {
 }
 
 function normalizeGuardrails(input: string, reviewerMode: ReviewerMode): GuardrailOutcome {
-  const violations = BLOCKED_PATTERNS.filter((pattern) => pattern.test(input)).map((pattern) => pattern.source);
+  // Normalize input: remove zero-width characters, normalize whitespace
+  const normalizedInput = input
+    .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width chars
+    .replace(/\s+/g, ' '); // Normalize whitespace
+
+  const violations = BLOCKED_PATTERNS.filter((pattern) => pattern.test(normalizedInput)).map((pattern) => pattern.source);
   const redactions: string[] = [];
-  if (/password|secret|private key/i.test(input)) {
+  
+  // Check for sensitive terms
+  if (/password|secret|private.?key|api.?key|credential/i.test(normalizedInput)) {
     redactions.push('sensitive_term');
   }
+  
+  // Check for PII
+  if (/\b\d{3}-\d{2}-\d{4}\b/.test(normalizedInput)) {
+    redactions.push('ssn');
+  }
+  if (/\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b/.test(normalizedInput)) {
+    redactions.push('credit_card');
+  }
+  
   return {
-    reviewerMode,
+    reviewerMode: validateReviewerMode(reviewerMode),
     violations,
     redactions,
     approved: violations.length === 0,
@@ -263,28 +360,70 @@ async function recordUsage(params: {
   await writeAiStore(store);
 }
 
+/**
+ * Performs evidence-grounded semantic search across the Atlas knowledge base.
+ * 
+ * Searches documents, evidence cards, data room items, and diligence questions.
+ * Results include citations with line-level references to source documents.
+ * Implements guardrails for prompt injection and PII redaction.
+ * 
+ * @param input.query - The search query string
+ * @param input.orgId - Optional organization ID to scope the search
+ * @param input.limit - Maximum number of results (default: 5, max: 50)
+ * @param input.reviewerMode - Review mode: 'draft', 'review_required', or 'evidence_only'
+ * @returns Search response with answer, results, citations, and guardrail status
+ * 
+ * @example
+ * ```typescript
+ * const response = await semanticSearch({
+ *   query: 'permit risk exposure',
+ *   orgId: 'org-123',
+ *   limit: 5,
+ *   reviewerMode: 'review_required'
+ * });
+ * console.log(response.answer);
+ * console.log(`Found ${response.results.length} relevant results`);
+ * ```
+ */
 export async function semanticSearch(input: { query: string; orgId?: string; limit?: number; reviewerMode?: ReviewerMode }): Promise<SearchResponse> {
   const startedAt = Date.now();
-  const reviewerMode = input.reviewerMode ?? 'review_required';
-  const guardrails = normalizeGuardrails(input.query, reviewerMode);
+  
+  // Validate and sanitize inputs
+  const query = truncateQuery(String(input.query || ''));
+  const reviewerMode = validateReviewerMode(input.reviewerMode);
+  const guardrails = normalizeGuardrails(query, reviewerMode);
+  
+  // Enforce max results limit
+  const requestedLimit = Math.min(
+    Math.max(0, Number(input.limit) || 5),
+    MAX_RESULTS
+  );
+  
   const template = getPromptTemplate('search');
   const { corpus } = await buildCorpus(input.orgId);
+  
   const results = corpus
     .map((entry) => ({
       id: entry.id,
       sourceType: entry.sourceType,
-      title: entry.title,
-      excerpt: summarizeExcerpt(entry.text, input.query),
-      score: overlapScore(input.query, `${entry.title} ${entry.text}`),
-      citations: entry.citations,
+      title: sanitizeText(entry.title),
+      excerpt: summarizeExcerpt(entry.text, query),
+      score: overlapScore(query, `${entry.title} ${entry.text}`),
+      citations: entry.citations.map(c => ({
+        ...c,
+        title: sanitizeText(c.title),
+        excerpt: sanitizePII(sanitizeText(c.excerpt)),
+      })),
       metadata: entry.metadata,
     }))
     .filter((entry) => entry.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, input.limit ?? 5);
+    .slice(0, requestedLimit);
 
   const citations = results.flatMap((result) => result.citations).slice(0, 8);
-  const answer = buildAnswer(input.query, results, reviewerMode);
+  
+  // Sanitize the answer - remove any injected content from document text
+  const answer = sanitizeText(sanitizePII(buildAnswer(query, results, reviewerMode)));
 
   await recordUsage({
     capability: 'search',
@@ -296,7 +435,7 @@ export async function semanticSearch(input: { query: string; orgId?: string; lim
     guardrails,
   });
 
-  return { query: input.query, answer, results, citations, guardrails };
+  return { query, answer, results, citations, guardrails };
 }
 
 function uniqueCitations(citations: AiCitation[]) {
@@ -317,8 +456,13 @@ export async function generateNarrative(input: {
   reviewerMode?: ReviewerMode;
 }): Promise<NarrativeResponse> {
   const startedAt = Date.now();
-  const templateType = input.templateType ?? 'ic_memo';
-  const reviewerMode = input.reviewerMode ?? 'review_required';
+  
+  // Validate template type - fallback to ic_memo if invalid
+  const validTemplateTypes: NarrativeTemplateType[] = ['ic_memo', 'board_pack', 'update_note'];
+  const templateType = validTemplateTypes.includes(input.templateType as NarrativeTemplateType) 
+    ? input.templateType! 
+    : 'ic_memo';
+  const reviewerMode = validateReviewerMode(input.reviewerMode);
   const template = getPromptTemplate('narrative', templateType);
   const search = await semanticSearch({ query: input.query, orgId: input.orgId, limit: 6, reviewerMode });
 
@@ -367,9 +511,10 @@ export async function generateNarrative(input: {
 
 export async function runDiligenceCopilot(input: { query: string; orgId?: string; reviewerMode?: ReviewerMode }): Promise<DiligenceResponse> {
   const startedAt = Date.now();
-  const reviewerMode = input.reviewerMode ?? 'review_required';
+  const reviewerMode = validateReviewerMode(input.reviewerMode);
+  const query = truncateQuery(String(input.query || ''));
   const template = getPromptTemplate('diligence');
-  const search = await semanticSearch({ query: input.query, orgId: input.orgId, limit: 8, reviewerMode });
+  const search = await semanticSearch({ query, orgId: input.orgId, limit: 8, reviewerMode });
   const { dataset } = await buildCorpus(input.orgId);
 
   const issues: DiligenceIssue[] = dataset.documents
@@ -377,21 +522,21 @@ export async function runDiligenceCopilot(input: { query: string; orgId?: string
       document.redFlags.map((flag): DiligenceIssue => ({
         id: flag.id,
         severity: flag.severity,
-        title: flag.title,
-        description: flag.description,
+        title: sanitizeText(flag.title),
+        description: sanitizeText(flag.description),
         citations: [
           {
             id: flag.citation.chunkId,
             sourceType: 'document_chunk',
             sourceId: flag.citation.documentId,
-            title: flag.citation.documentName,
-            excerpt: flag.citation.excerpt,
+            title: sanitizeText(flag.citation.documentName),
+            excerpt: sanitizePII(sanitizeText(flag.citation.excerpt)),
             lineRange: flag.citation.lineRange,
           },
         ],
       })),
     )
-    .filter((issue) => overlapScore(input.query, `${issue.title} ${issue.description}`) > 0)
+    .filter((issue) => overlapScore(query, `${issue.title} ${issue.description}`) > 0)
     .slice(0, 6);
 
   const missingDataPrompts: DiligencePrompt[] = dataset.documents
@@ -400,8 +545,8 @@ export async function runDiligenceCopilot(input: { query: string; orgId?: string
         .filter((check) => check.status !== 'complete')
         .map((check): DiligencePrompt => ({
           id: `${document.id}:${check.id}`,
-          question: `Please provide or confirm ${check.label.toLowerCase()} for ${document.name}.`,
-          reason: check.detail,
+          question: `Please provide or confirm ${check.label.toLowerCase()} for ${sanitizeText(document.name)}.`,
+          reason: sanitizeText(check.detail),
           priority: check.status === 'missing' ? 'high' : 'medium',
           citations: document.chunks[0]?.citations
             ? [
@@ -409,15 +554,15 @@ export async function runDiligenceCopilot(input: { query: string; orgId?: string
                   id: document.chunks[0].id,
                   sourceType: 'document_chunk',
                   sourceId: document.id,
-                  title: document.name,
-                  excerpt: document.chunks[0].text,
+                  title: sanitizeText(document.name),
+                  excerpt: sanitizePII(sanitizeText(document.chunks[0].text)),
                   lineRange: document.chunks[0].citations[0]?.lineRange,
                 },
               ]
             : [],
         })),
     )
-    .filter((prompt) => overlapScore(input.query, `${prompt.question} ${prompt.reason}`) > 0 || issues.length > 0)
+    .filter((prompt) => overlapScore(query, `${prompt.question} ${prompt.reason}`) > 0 || issues.length > 0)
     .slice(0, 6);
 
   const summary = issues.length
@@ -455,9 +600,10 @@ function computeUsageAnalytics(events: UsageEvent[], guardrailEvents: GuardrailE
 
 export async function workflowAssistant(input: { orgId: string; reviewerMode?: ReviewerMode; includeEvaluations?: boolean }): Promise<AssistantResponse> {
   const startedAt = Date.now();
-  const reviewerMode = input.reviewerMode ?? 'review_required';
+  const reviewerMode = validateReviewerMode(input.reviewerMode);
+  const orgId = String(input.orgId || '');
   const template = getPromptTemplate('assistants');
-  const guardrails = normalizeGuardrails(`org:${input.orgId}`, reviewerMode);
+  const guardrails = normalizeGuardrails(`org:${orgId}`, reviewerMode);
 
   const workflowActions = listWorkflowActions({ orgId: input.orgId });
   const diligenceQuestions = listDiligenceQuestions({ orgId: input.orgId, status: 'open' });

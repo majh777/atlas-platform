@@ -100,6 +100,32 @@ function buildSensitivity(input: FinancialScenarioInput): ScenarioStressResult[]
   });
 }
 
+/**
+ * Calculates a complete financial scenario with metrics, covenants, and sensitivity analysis.
+ * 
+ * Computes key metrics including DSCR, leverage ratio, project IRR, and equity multiple.
+ * Runs sensitivity analysis against standard stress shocks.
+ * Generates a lender-ready pack with highlights, checklists, and audit trail.
+ * 
+ * @param input - The financial scenario input parameters
+ * @returns Complete scenario result with metrics, covenant analysis, and lender pack
+ * @throws Error if input validation fails
+ * 
+ * @example
+ * ```typescript
+ * const result = calculateScenario({
+ *   id: 'scenario-001',
+ *   targetDebtAmount: 150_000_000,
+ *   targetEquityAmount: 50_000_000,
+ *   tenorYears: 15,
+ *   fundingStructure: 'project_finance',
+ *   covenantDefinition: { minDscr: 1.35, maxLeverage: 6.0, minIcRatio: 2.0 },
+ *   // ... other inputs
+ * });
+ * console.log(`DSCR: ${result.metrics.dscr}x`);
+ * console.log(`Breaches: ${result.covenantBreaches.join(', ')}`);
+ * ```
+ */
 export function calculateScenario(input: FinancialScenarioInput): FinancialScenarioResult {
   const issues = validateScenarioInput(input).filter((issue) => issue.level === "error");
   if (issues.length > 0) {

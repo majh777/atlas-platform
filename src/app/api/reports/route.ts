@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, type AuthenticatedRequest } from '@/lib/auth/middleware';
 import { generateReport, listScheduledReports } from '@/lib/portals/store';
 import type { ReportFormat } from '@/types/portal';
 
@@ -8,7 +9,7 @@ function getContentType(format: ReportFormat) {
   return 'application/json; charset=utf-8';
 }
 
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const { searchParams } = new URL(request.url);
   const portalId = searchParams.get('portalId');
   const format = (searchParams.get('format') as ReportFormat | null) ?? 'json';
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ data: report });
 }
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   const body = await request.json();
   const report = generateReport(body.portalId, (body.format as ReportFormat) ?? 'pdf');
 
@@ -44,3 +45,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ data: report }, { status: 201 });
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);

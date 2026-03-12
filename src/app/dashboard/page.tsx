@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Shield, BarChart3, FileText, TrendingUp, Building2, Workflow, 
-  Server, ShieldCheck, Users, MessageSquare, Database, LogOut,
+  Server, ShieldCheck, Users, MessageSquare, Database,
   ChevronRight, Bell, Activity, Clock
 } from "lucide-react";
 import Link from "next/link";
@@ -53,7 +53,8 @@ const recentActivity = [
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional hydration guard
+  useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
   return (

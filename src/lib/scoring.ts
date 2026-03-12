@@ -26,6 +26,9 @@ export function calculateOpportunityScore(criteria: OpportunityCriteria): number
 }
 
 export function inferProbability(stage: PipelineStage, score: number): number {
+  // Lost deals always have 0% probability regardless of score
+  if (stage === 'Lost') return 0;
+  
   const base = STAGE_PROBABILITY[stage] * 100;
   const scoreAdjustment = (score - 50) * 0.4;
   return Math.max(0, Math.min(100, Math.round(base + scoreAdjustment)));

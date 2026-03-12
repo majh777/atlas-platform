@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withAuth, type AuthenticatedRequest } from "@/lib/auth/middleware";
 import { calculateScenario } from "@/lib/finance/calculations";
 import { importScenarioCsv } from "@/lib/finance/csv";
 import { listScenarios } from "@/lib/finance/repository";
 import type { FinancialScenarioInput } from "@/lib/finance/types";
 import { validateScenarioInput } from "@/lib/finance/validation";
 
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest, _auth: AuthenticatedRequest) {
   const format = request.nextUrl.searchParams.get("format");
   const scenarios = listScenarios();
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(scenarios);
 }
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest, _auth: AuthenticatedRequest) {
   const payload = await request.json();
 
   if (payload.csv) {
@@ -39,3 +40,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ result: calculateScenario(input), issues });
 }
+
+export const GET = withAuth(handleGet);
+export const POST = withAuth(handlePost);
