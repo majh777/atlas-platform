@@ -104,4 +104,53 @@ export async function seed(): Promise<void> {
   run(`INSERT INTO tasks (id, org_id, workspace_id, assigned_to, created_by, title, status, priority) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     randomUUID(), orgId, ws2Id, viewerId, adminId,
     'Review infrastructure portfolio summary', 'pending', 'low');
+
+  // Module 9 - ESG / permitting demo data
+  const permitId = randomUUID();
+  const obligationId = randomUUID();
+  const communityCaseId = randomUUID();
+  const incidentId = randomUUID();
+  const reportPackId = randomUUID();
+
+  run(`INSERT INTO permits (id, org_id, workspace_id, portfolio_id, title, permit_number, permit_type, authority, jurisdiction, status, risk_level, issue_date, expiry_date, review_date, alert_days, owner_user_id, notes, evidence_links, metadata, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    permitId, orgId, ws1Id, p1Id,
+    'Mining exploitation licence', 'ML-CM-2026-014', 'mining_licence', 'Cameroon Ministry of Mines', 'Cameroon',
+    'expiring', 'high', '2025-01-10', '2026-04-20', '2026-03-30', 120, analystId,
+    'Renewal dossier requires updated social commitments annex.', JSON.stringify(['/evidence/permit-ml-cm-2026-014']), JSON.stringify({ corridor: 'Kribi' }), adminId);
+
+  run(`INSERT INTO obligations (id, org_id, workspace_id, portfolio_id, permit_id, title, obligation_type, source_reference, commitment_party, status, priority, due_date, owner_user_id, notes, evidence_links, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    obligationId, orgId, ws1Id, p1Id, permitId,
+    'Submit quarterly environmental monitoring report', 'regulatory', 'Permit condition 7.2', 'Regional Mines Directorate', 'open', 'high', '2026-03-25', analystId,
+    'Bundle water sampling results and signed site inspection record.', JSON.stringify(['/evidence/water-sampling-q1']), adminId);
+
+  run(`INSERT INTO community_cases (id, org_id, workspace_id, portfolio_id, case_type, sensitivity, status, stakeholder_name, stakeholder_group, location, channel, summary, details, received_at, owner_user_id, escalation_level, confidential_notes, evidence_links, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    communityCaseId, orgId, ws1Id, p1Id,
+    'grievance', 'sensitive', 'escalated', 'Mbalam community committee', 'host_community', 'Mbalam North', 'in_person',
+    'Employment allocation grievance raised by village committee', 'Committee requested transparent publication of local hiring shortlist and interview records.', '2026-03-05T09:30:00.000Z', analystId, 'executive',
+    'Handle via restricted circulation due to local political sponsorship.', JSON.stringify(['/evidence/community-grievance-2026-03']), adminId);
+
+  run(`INSERT INTO esg_incidents (id, org_id, workspace_id, portfolio_id, category, severity, status, title, description, occurred_at, reported_at, owner_user_id, escalation_level, regulator_notified, immediate_actions, evidence_links, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    incidentId, orgId, ws1Id, p1Id,
+    'environmental', 'high', 'escalated', 'Sediment overflow at haul-road drainage point', 'Heavy rainfall caused temporary overflow into downstream drainage channel.', '2026-03-07T12:20:00.000Z', '2026-03-07T13:10:00.000Z', analystId, 'executive', 0,
+    'Deploy containment berm, sample water, brief regulator if exceedances confirmed.', JSON.stringify(['/evidence/incident-sediment-overflow']), adminId);
+
+  run(`INSERT INTO case_actions (id, org_id, workspace_id, portfolio_id, target_type, target_id, title, description, status, priority, due_at, assigned_to, is_sensitive, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    randomUUID(), orgId, ws1Id, p1Id,
+    'incident', incidentId, 'Close out sediment overflow CAPA', 'Submit root-cause analysis and photographic closure evidence.', 'open', 'high', '2026-03-14T12:00:00.000Z', analystId, 0, adminId);
+
+  run(`INSERT INTO report_packs (id, org_id, workspace_id, portfolio_id, pack_type, title, status, period_start, period_end, generated_by, template_sections, package_summary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    reportPackId, orgId, ws1Id, p1Id,
+    'regulatory_report', 'Q1 2026 environmental and community filing pack', 'ready', '2026-01-01', '2026-03-31', adminId,
+    JSON.stringify(['executive-summary', 'regulatory-filings', 'permit-status', 'open-obligations', 'evidence-index']),
+    JSON.stringify({ evidenceCount: 3, packaging: 'board-ready' }));
+
+  run(`INSERT INTO report_evidence_items (id, report_pack_id, source_type, source_id, title, evidence_url, citation, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    randomUUID(), reportPackId, 'permit', permitId, 'Permit renewal tracker', '/evidence/permit-ml-cm-2026-014', 'Permit renewal dossier v2', JSON.stringify(['permit', 'renewal']));
+  run(`INSERT INTO report_evidence_items (id, report_pack_id, source_type, source_id, title, evidence_url, citation, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    randomUUID(), reportPackId, 'incident', incidentId, 'Overflow incident log', '/evidence/incident-sediment-overflow', 'Incident register item #17', JSON.stringify(['incident', 'environmental']));
+
+  run(`INSERT INTO stakeholder_metrics (id, org_id, workspace_id, portfolio_id, metric_type, metric_key, metric_value, unit, period_start, period_end, notes, recorded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    randomUUID(), orgId, ws1Id, p1Id, 'local_content', 'local_procurement_share', 42, '%', '2026-01-01', '2026-03-31', 'Local supplier spend increased after corridor subcontracting.', adminId);
+  run(`INSERT INTO stakeholder_metrics (id, org_id, workspace_id, portfolio_id, metric_type, metric_key, metric_value, unit, period_start, period_end, notes, recorded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    randomUUID(), orgId, ws1Id, p1Id, 'stakeholder_engagement', 'engagement_sessions', 11, 'sessions', '2026-01-01', '2026-03-31', 'Village meetings, regulator briefings, and supplier workshops.', adminId);
 }

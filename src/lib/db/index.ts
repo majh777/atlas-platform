@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { type Database as DatabaseType } from 'better-sqlite3';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 let db: DatabaseType | null = null;
 
@@ -23,7 +24,7 @@ export function getDb(): DatabaseType {
  * Safe to call multiple times thanks to IF NOT EXISTS clauses.
  */
 export function initDb(): void {
-  const schemaPath = new URL('./schema.sql', import.meta.url);
+  const schemaPath = fileURLToPath(new URL('./schema.sql', import.meta.url));
   const schemaSql = readFileSync(schemaPath, 'utf-8');
   const database = getDb();
   database.exec(schemaSql);

@@ -58,6 +58,13 @@ const modules = [
     status: "New",
   },
   {
+    title: "Module 9 · ESG, Permitting, Community and Regulatory Controls",
+    href: "/esg",
+    description:
+      "Permit registers, expiry monitoring, obligation tracking, grievance workflows, ESG incidents, regulatory reporting packs, and local-content / stakeholder metrics.",
+    status: "New",
+  },
+  {
     title: "Evidence workspace",
     href: "/evidence",
     description:
@@ -75,8 +82,8 @@ export default function Home() {
           <h1 className="text-5xl font-semibold tracking-tight">Project finance workflows for investment committee discipline.</h1>
           <p className="text-base leading-8 text-slate-300">
             Atlas is a lender-grade workspace for origination, diligence, bankability scoring, scenario analysis,
-            asset telemetry, and exportable decision packs. Module 8 now extends the stack into operational
-            intelligence alongside deal radar, document intelligence, bankability scoring, and financial modelling.
+            asset telemetry, and exportable decision packs. Module 9 now adds permitting, ESG incidents,
+            community controls, reporting packs, and local-content / stakeholder metrics to the operating stack.
           </p>
         </section>
 

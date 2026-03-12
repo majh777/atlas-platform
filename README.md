@@ -163,6 +163,26 @@ The schema is designed for easy migration:
 - Readiness scorecards by project, workstream, counterparty
 - Committee-grade narratives with evidence links
 
+## Module 9: ESG, Permitting, Community and Regulatory Controls
+
+- Permit register with expiry-watch classification and alert windows
+- Obligation / commitment tracker for permit, regulatory, ESG, and community actions
+- Community issue and grievance workflow with sensitive-case handling
+- ESG incident register with severity-based escalation and corrective-action routing
+- Regulatory reporting packs and evidence bundles with template sections
+- Local-content and stakeholder-engagement metrics in the same operating surface
+
+### Module 9 API
+
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET/POST | `/api/permits` | Permit register dashboard, create permits or linked obligations |
+| GET/PATCH | `/api/permits/{id}` | Retrieve or update permit / obligation (`?entityType=obligation`) |
+| GET/POST | `/api/esg` | ESG dashboard, create obligations, community cases, report packs, actions, metrics |
+| GET/PATCH | `/api/esg/{id}` | Retrieve/update community case, obligation, or action |
+| GET/POST | `/api/incidents` | Incident dashboard, create incidents or incident actions |
+| GET/PATCH | `/api/incidents/{id}` | Retrieve/update incident or linked action |
+
 ## Module 8: Asset Intelligence, Telemetry and Predictive Maintenance
 
 - `/api/assets` for asset registry reads and snapshot analytics
