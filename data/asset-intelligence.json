@@ -82,7 +82,7 @@
       "label": "Crusher SCADA",
       "status": "online",
       "pollingIntervalMinutes": 5,
-      "lastSyncAt": "2026-03-12T13:13:21.975Z",
+      "lastSyncAt": "2026-03-12T16:19:04.752Z",
       "mappedMetrics": [
         "utilization",
         "energy_draw",
@@ -111,11 +111,11 @@
   ],
   "telemetry": [
     {
-      "id": "d8ede7b0-efb3-425e-a5a5-71026feaf6ca",
+      "id": "c11baf9d-b1ef-4748-8af8-c4d1df60f77f",
       "assetId": "asset-crush-01",
       "connectorId": "conn-crush-scada",
       "metric": "temperature",
-      "timestamp": "2026-03-12T13:13:21.975Z",
+      "timestamp": "2026-03-12T16:19:04.752Z",
       "value": 101,
       "unit": "c",
       "quality": 0.95,
@@ -125,11 +125,11 @@
       ]
     },
     {
-      "id": "cc581f48-fd63-4dc2-be57-7556ba38a7c1",
+      "id": "404561ae-22cc-45a6-9dba-795c1402c2ed",
       "assetId": "asset-crush-01",
       "connectorId": "conn-crush-scada",
       "metric": "vibration",
-      "timestamp": "2026-03-12T13:13:21.975Z",
+      "timestamp": "2026-03-12T16:19:04.752Z",
       "value": 9.5,
       "unit": "mm/s",
       "quality": 0.95,
@@ -532,36 +532,36 @@
       "assetId": "asset-haul-01",
       "title": "Komatsu 930E Haul Truck 01 predictive maintenance window",
       "reason": "2 anomaly signals indicate rising failure likelihood.",
-      "dueAt": "2026-03-13T13:13:21.977Z",
+      "dueAt": "2026-03-13T16:19:04.754Z",
       "predictedFailureWindowDays": 2,
       "estimatedDowntimeHours": 10.2,
       "recommendedAction": "Inspect bearings, lubrication loop, and drivetrain alignment.",
       "status": "scheduled",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "asset-crush-01-maint-76",
       "assetId": "asset-crush-01",
       "title": "Primary Crusher Line A predictive maintenance window",
       "reason": "Service interval due in 14 runtime hours.",
-      "dueAt": "2026-03-13T13:13:21.977Z",
+      "dueAt": "2026-03-13T16:19:04.754Z",
       "predictedFailureWindowDays": 3,
       "estimatedDowntimeHours": 9.1,
       "recommendedAction": "Execute OEM preventive maintenance pack and reset condition baseline.",
       "status": "recommended",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "asset-gen-01-maint-79",
       "assetId": "asset-gen-01",
       "title": "Hybrid Power Plant Block 1 predictive maintenance window",
       "reason": "Service interval due in 29 runtime hours.",
-      "dueAt": "2026-03-13T13:13:21.977Z",
+      "dueAt": "2026-03-13T16:19:04.754Z",
       "predictedFailureWindowDays": 3,
       "estimatedDowntimeHours": 9.3,
       "recommendedAction": "Execute OEM preventive maintenance pack and reset condition baseline.",
       "status": "recommended",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     }
   ],
   "alerts": [
@@ -617,7 +617,7 @@
       "channel": "maintenance",
       "title": "Komatsu 930E Haul Truck 01 predictive maintenance window",
       "body": "2 anomaly signals indicate rising failure likelihood. Inspect bearings, lubrication loop, and drivetrain alignment.",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "alert-asset-crush-01-maint-76",
@@ -626,7 +626,7 @@
       "channel": "maintenance",
       "title": "Primary Crusher Line A predictive maintenance window",
       "body": "Service interval due in 14 runtime hours. Execute OEM preventive maintenance pack and reset condition baseline.",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "alert-asset-gen-01-maint-79",
@@ -635,7 +635,7 @@
       "channel": "maintenance",
       "title": "Hybrid Power Plant Block 1 predictive maintenance window",
       "body": "Service interval due in 29 runtime hours. Execute OEM preventive maintenance pack and reset condition baseline.",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "alert-compliance-asset-crush-01",
@@ -644,7 +644,7 @@
       "channel": "compliance",
       "title": "Inspection readiness watch",
       "body": "1 finding(s), 1 missing document(s), readiness 58%.",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "alert-compliance-asset-gen-01",
@@ -653,7 +653,7 @@
       "channel": "compliance",
       "title": "Inspection readiness non compliant",
       "body": "2 finding(s), 2 missing document(s), readiness 16%.",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     },
     {
       "id": "alert-commercial-asset-haul-01",
@@ -662,7 +662,7 @@
       "channel": "commercial",
       "title": "Komatsu 930E Haul Truck 01 commercial underperformance",
       "body": "Utilization 69% vs target 82%; revenue/hour 7680 vs expected 7680.",
-      "createdAt": "2026-03-12T13:13:21.977Z"
+      "createdAt": "2026-03-12T16:19:04.754Z"
     }
   ],
   "compliance": [
